@@ -35,6 +35,14 @@ typedef struct slacknet_url_parameter_t {
 } SlacknetURLParameter;
 
 /*
+ * Generates a string from an array of SlacknetURLParameters. The string will be
+ * formatted such as to typically suit the format expected by URL GET parameters
+ * or POST parameters as per RFC-3986.
+ */ 
+char*
+slacknet_format_params_array(SlacknetURLParameter params[], size_t params_size);
+
+/*
  * Creates an array of SlacknetURLParameters from an array of strings. This
  * works by taking in alternating parameter names and parameter values. For
  * example, the input ["param1", "value1", "param2", "value2"] would produce
@@ -44,14 +52,16 @@ typedef struct slacknet_url_parameter_t {
  *
  * This function will return NULL if the params_size variable is an odd number.
  */
-SlacknetURLParameter* slacknet_create_param_array(char** params, size_t params_size);
+SlacknetURLParameter*
+slacknet_create_param_array(char** params, size_t params_size);
 
 /*
  * A function that will add standard URL GET parameters to a base URL. It
  * accepts the original URL, as well as an array of SlacknetURLParameters.
  */
-char* slacknet_paramaterize_url(char* origurl,
-                                SlacknetURLParameter params[],
-                                size_t params_size);
+char*
+slacknet_paramaterize_url(char* origurl,
+                          SlacknetURLParameter params[],
+                          size_t params_size);
 
 #endif

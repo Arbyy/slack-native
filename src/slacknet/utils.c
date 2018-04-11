@@ -50,15 +50,11 @@ slacknet_create_param_array(char** params, size_t params_size) {
     return retval;
 }
 
-char* 
-slacknet_paramaterize_url(char* origurl,
-                          SlacknetURLParameter params[],
-                          size_t params_size) {
-    size_t origsize = strlen(origurl);
-    
+char*
+slacknet_format_params_array(SlacknetURLParameter params[],
+                             size_t params_size) {
     // Add (params_size - 1) to account for the '&' between parameters
-    // Add 1 to account for the '?' that goes before the URL parameters
-    unsigned int totalsize = origsize + (params_size - 1) + 1;
+    unsigned int totalsize = (params_size - 1);
     unsigned int i;
     for (i = 0; i <= params_size - 1; ++i) {
         // Add 1 to account for the '=' between the parameter name and data
@@ -69,8 +65,6 @@ slacknet_paramaterize_url(char* origurl,
 
     char* retval = malloc(totalsize);
     memset(retval, 0, totalsize);
-    strcpy(retval, origurl);
-    retval[origsize] = '?';
     for (i = 0; i <= params_size - 1; ++i) {
         strcat(retval, params[i].name);
         strcat(retval, "=");
@@ -80,6 +74,21 @@ slacknet_paramaterize_url(char* origurl,
             strcat(retval, "&");
         }
     }
+
+    return retval;
+}
+
+char*
+slacknet_paramaterize_url(char* origurl,
+                          SlacknetURLParameter params[],
+                          size_t params_size) {
+    size_t origsize = strlen(origurl);
+    char* paramstr = slacknet_format_params_array(params, params_size);
+    // Add 1 for the '?' that comes before the params
+    char* retval = malloc(origsize + strlen(paramstr) + 1);
+    strcpy(retval, origurl);
+    strcat(retval, "?");
+    strcat(retval, paramstr);
 
     return retval;
 }
