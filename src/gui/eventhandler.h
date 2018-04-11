@@ -21,10 +21,10 @@ EventListenerCollection* GUI_new_listener_coll();
 void GUI_free_listener_coll(EventListenerCollection* coll);
 
 /*
- * Appends the supplied event handler to the `EventListener` struct for the
- * specified element. The function is appended in such a way that 
+ * Appends the supplied event handler to the event handler array for the
+ * supplied event. Returns false if the event handler could not be added.
  */
-void GUI_when(GUI* element, EventType event, EventHandler handler);
+bool GUI_when(GUI* element, EventType type, EventHandler handler);
 
 /*
  * Called by external code when it detects conditions where a GUI event should

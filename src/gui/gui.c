@@ -3,8 +3,9 @@
 
 #include <SDL2/SDL.h>
 
-#include "gui.h"
+#include "eventhandler.h"
 #include "event.h"
+#include "gui.h"
 
 
 void GUI_free(GUI* elem) {
@@ -13,6 +14,7 @@ void GUI_free(GUI* elem) {
     if (elem->next != NULL)
         GUI_free(elem->next);
 
+    GUI_free_listener_coll(elem->listeners);
     SDL_FreeSurface(elem->surface);
 
     if (elem->aux != NULL)
@@ -27,7 +29,7 @@ GUI* GUI_alloc_generic(int width, int height) {
         return NULL;
 
     // Clear all pointer fields
-    gui->listener = NULL;
+    gui->listeners = NULL;
     gui->surface = NULL;
     gui->style = NULL;
     gui->paint = NULL;
@@ -36,8 +38,7 @@ GUI* GUI_alloc_generic(int width, int height) {
     gui->aux = NULL;
 
     // Allocate pointer fields
-    gui->listeners = malloc(sizeof(EventListenerCollection));
-    // TODO: replace with initialiser from eventhandler.h
+    gui->listeners = GUI_new_listener_coll();
 
     gui->surface = SDL_CreateRGBSurface(0, width, height, 32,
                                         0xFF000000,
@@ -46,7 +47,7 @@ GUI* GUI_alloc_generic(int width, int height) {
                                         0x000000FF);
 
     // If any allocations failed, clean up everything
-    if (gui->listener == NULL ||
+    if (gui->listeners == NULL ||
         gui->surface == NULL) {
         GUI_free(gui);
         return NULL;

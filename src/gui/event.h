@@ -5,7 +5,6 @@
 #ifndef _GUI_EVENT_H
 #define _GUI_EVENT_H
 
-
 /*
  * Event types used both internally and by user code
  */
@@ -33,14 +32,15 @@ typedef void* (*EventHandler)(GUI*, void*);
 typedef struct event_listener_t {
     EventType type;
     EventHandler handler;
+    EventHandler *next;
 } EventListener;
 
 /*
- * Dynamic array of event handlers.
+ * Linked list of event handlers. May one day have extra information here.
  */
 typedef struct event_listener_coll_t {
     unsigned int count;
-    EventListener **listeners;
+    EventListener *first;
 } EventListenerCollection;
 
 #endif
