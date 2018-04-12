@@ -92,3 +92,49 @@ slacknet_paramaterize_url(char* origurl,
 
     return retval;
 }
+
+CURLcode slacknet_send_post(char* url, char* params, SlacknetDataBuffer* data) {
+    CURL* curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(params));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params);
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "./cacert.pem");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, slacknet_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)data);
+    CURLcode result = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
+CURLcode
+slacknet_send_post_json(char* url, char* token, cJSON* params,
+                        SlacknetDataBuffer* data) {
+    // 23 because that is the size of "Authorization: Bearer " exactly.
+    // Add 1 specifically for the null terminator
+    char* authheader = malloc(23 + strlen(token) + 1);
+    strcpy(authheader, "Authorization: Bearer ");
+    strcat(authheader, token);
+    
+    struct curl_slist* headers = NULL;
+    headers = curl_slist_append(headers, "Content-type: application/json");
+    headers = curl_slist_append(headers, authheader);
+    headers = curl_slist_append(headers, "charsets: utf-8");
+
+    char* jsonbody = cJSON_PrintUnformatted(params);
+
+    CURL* curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(jsonbody));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonbody);
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "./cacert.pem");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, slacknet_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)data);
+    CURLcode result = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+
+    free(jsonbody);
+    free(authheader);
+
+    return result;
+}

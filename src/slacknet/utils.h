@@ -1,7 +1,9 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+#include "../cJSON/cJSON.h"
 #include <stddef.h>
+#include <curl/curl.h>
 
 /*
  * A basic data structure to hold the contents of a returned libcurl call.
@@ -63,5 +65,38 @@ char*
 slacknet_paramaterize_url(char* origurl,
                           SlacknetURLParameter params[],
                           size_t params_size);
+
+/*
+ * A conveniance function that just sends a POST request to the URL with
+ * those params used. The params can be generated using the function
+ * slacknet_format_params_array. The results of the POST request are put
+ * into the data argument.
+ *
+ * The params are URL encoded into the POST request.
+ *
+ * This function returns the CURLcode returned by curl_easy_perform for error
+ * detection.
+ *
+ * NOTE: This function expects that the file "cacert.pem" exists in the same
+ * directory as the executable. This is used to verify the SSL certificates
+ * presented by websites.
+ */ 
+CURLcode slacknet_send_post(char* url, char* params, SlacknetDataBuffer* data);
+
+/*
+ * A conveniance function similar to that of slacknet_send_post, however it
+ * accepts a cJSON object, and will serialize it before sending it as the body
+ * of the POST request.
+ *
+ * This function also requires the Slack API auth token seperate from the JSON
+ * body as per the Slack API rules. More info on why this is can be found on
+ * https://api.slack.com/web.
+ *
+ * NOTE: Just like slacknet_send_post, this function assumes the existence of
+ * the file "cacert.pem" in the same directory as the executable.
+ */ 
+CURLcode
+slacknet_send_post_json(char* url, char* token, cJSON* params,
+                        SlacknetDataBuffer* data);
 
 #endif
