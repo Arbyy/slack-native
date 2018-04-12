@@ -25,6 +25,31 @@ static void paint(GUI* this) {
     this->dirty = false;
 }
 
+static void* set_mouseover(GUI* this, void* data) {
+    ButtonData* bdata = this->aux;
+    bdata->mouseover = true;
+    return NULL;
+}
+
+static void* clear_mouseover(GUI* this, void* data) {
+    ButtonData* bdata = this->aux;
+    bdata->mouseover = false;
+    return NULL;
+}
+
+static void* set_mousedown(GUI* this, void* data) {
+    ButtonData* bdata = this->aux;
+    bdata->mousedown = true;
+    return NULL;
+}
+
+static void* clear_mousedown(GUI* this, void* data) {
+    // TODO: add actions when the mouse is released
+    ButtonData* bdata = this->aux;
+    bdata->mousedown = false;
+    return NULL;
+}
+
 static void auxfree(void* aux) {
     ButtonData* data = aux;
 
@@ -52,6 +77,12 @@ GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
 
     // Set function for cleaning up the aux struct
     this->auxfree = auxfree;
+
+    // Add default event listeners
+    GUI_when(this, MOUSE_ENTERED, set_mouseover);
+    GUI_when(this, MOUSE_EXITED, clear_mouseover);
+    GUI_when(this, CLICKED, set_mousedown);
+    GUI_when(this, RELEASED, clear_mousedown);
 
     // We haven't been rendered before
     this->dirty = true;

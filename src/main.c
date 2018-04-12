@@ -4,6 +4,7 @@ Super simple main file just to test all of the dependencies.
 
 */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -15,6 +16,7 @@ Super simple main file just to test all of the dependencies.
 #undef main
 
 #include "gui/element/button.h"
+#include "gui/eventhandler.h"
 #include "gui/gui.h"
 
 const int SCREEN_WIDTH = 640;
@@ -64,6 +66,14 @@ int main(int argc, char* args[]) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT)
                         goto quit;
+                    if (event.type == SDL_MOUSEMOTION) {
+                        MouseData* data = malloc(sizeof(MouseData));
+                        if (data != NULL) {
+                            SDL_GetMouseState(&data->x, &data->y);
+                            GUI_trigger(frame, MOUSE_MOVED, data);
+                            free(data);
+                        }
+                    }
                 }
 
                 // GUI test stuff

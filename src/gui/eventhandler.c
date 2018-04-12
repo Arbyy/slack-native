@@ -47,3 +47,19 @@ bool GUI_when(GUI* element, EventType type, EventHandler handler) {
 
     return true;
 }
+
+
+bool GUI_trigger(GUI* root, EventType event, void* data) {
+    EventListener* listener = root->listeners->first;
+    bool found_any = false;
+    while(listener != NULL) {
+        if (listener->type == event) {
+            listener->handler(root, data);
+            found_any = true;
+        }
+
+        listener = listener->next;
+    }
+
+    return found_any;
+}

@@ -13,7 +13,7 @@
 /*
  * Creates a new, empty array of event listeners for a GUI element.
  */
-EventListenerCollection* GUI_new_listener_coll();
+EventListenerCollection* GUI_new_listener_coll(void);
 
 /*
  * Does the opposite of above...
@@ -38,6 +38,6 @@ bool GUI_when(GUI* element, EventType type, EventHandler handler);
  * Returns a boolean stating whether or not any event handlers were found and
  * fired.
  */
-bool GUI_trigger(GUI* root, EventType event);
+bool GUI_trigger(GUI* root, EventType event, void* data);
 
 #endif

@@ -10,10 +10,15 @@
  */
 typedef enum events_t {
     /* External use */
-    MOUSE_ENTER,
-    MOUSE_EXIT,
+    /* Mouse */
+    MOUSE_ENTERED,
+    MOUSE_MOVED,
+    MOUSE_EXITED,
     CLICKED,
+    RELEASED,
+    /* Keyboard */
     KEY_PRESSED,
+    KEY_RELEASED,
 
     /* Internal use */
     RESIZED
@@ -46,6 +51,15 @@ typedef struct event_listener_coll_t {
 
 
 /* Data supplied to the void* second argument to `EventHandler`s. */
+
+/*
+ * Data supplied for all mouse events, namely : `MOUSE_ENTER`, `MOUSE_EXIT`,
+ * `CLICKED`, `RELEASED`.
+ */
+typedef struct mouse_data_t {
+    int x, y;   /* used by all mouse events */
+    int button; /* only for `CLICKED`/`RELEASED` */
+} MouseData;
 
 /*
  * Data supplied for `RESIZED` events.
