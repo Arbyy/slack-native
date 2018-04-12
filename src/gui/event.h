@@ -24,16 +24,17 @@ typedef enum events_t {
  * handler types to use the same functions when being passed around.
  */
 typedef struct gui_t GUI; /* See gui.h */
-typedef void* (*EventHandler)(GUI*, void*);
+typedef void* (*EventHandler)(GUI* this, void* data);
 
 /*
  * A single event handler.
  */
-typedef struct event_listener_t {
+typedef struct event_listener_t EventListener;
+struct event_listener_t {
     EventType type;
     EventHandler handler;
-    EventHandler *next;
-} EventListener;
+    EventListener *next;
+};
 
 /*
  * Linked list of event handlers. May one day have extra information here.
@@ -42,5 +43,15 @@ typedef struct event_listener_coll_t {
     unsigned int count;
     EventListener *first;
 } EventListenerCollection;
+
+
+/* Data supplied to the void* second argument to `EventHandler`s. */
+
+/*
+ * Data supplied for `RESIZED` events.
+ */
+typedef struct resize_data_t {
+    int width, height; // New max width and height of element
+} ResizeData;
 
 #endif

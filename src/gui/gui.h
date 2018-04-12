@@ -78,9 +78,17 @@ void GUI_add_element(GUI* parent, GUI* element);
  * element's state is dirty.
  *
  * The function works from the bottom up, painting parents after children, until
- * it reaches the element supplied. It then paints that element onto the root
- * GUI element also provided.
+ * it reaches the element supplied.
  */
-void GUI_paint(GUI* root, GUI* element);
+void GUI_paint(GUI* element);
+
+/*
+ * Called on a root element, this function recursively checks children to see if
+ * their `dirty` property has been set to true. If it has, it calls `GUI_paint`
+ * on that element, which draws all of its children. If the child `GUI_update`
+ * returns true, the parent is also redrawn. In this way, the whole display can
+ * be updated while redrawing as few buffers as possible.
+ */
+bool GUI_update(GUI* root);
 
 #endif

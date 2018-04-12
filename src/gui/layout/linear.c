@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "../eventhandler.h"
+#include "../event.h"
 #include "../gui.h"
 #include "linear.h"
 
@@ -12,6 +13,12 @@ static void paint(GUI* this) {
         alignment = ((LinearLayoutData*) this->aux)->alignment;
 
     return;
+}
+
+
+static void* resize(GUI* this, ResizeData* data) {
+    // TODO: adjust layout of elements here
+    return NULL;
 }
 
 

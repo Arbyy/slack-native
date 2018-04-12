@@ -31,9 +31,9 @@ bool GUI_when(GUI* element, EventType type, EventHandler handler);
  * be triggered.
  *
  * The root element is the element that initially received the event, such as a
- * button receiving a button click event. The root element's handlers receive
- * the event first, before the event is sent to successive children of the root
- * element.
+ * button receiving a button click event. It is then up to that element to
+ * to decide whether or not to propagate the event by calling this function
+ * again on its children.
  *
  * Returns a boolean stating whether or not any event handlers were found and
  * fired.

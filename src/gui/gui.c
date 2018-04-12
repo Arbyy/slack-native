@@ -22,7 +22,6 @@ void GUI_free(GUI* elem) {
     free(elem);
 }
 
-
 GUI* GUI_alloc_generic(int width, int height) {
     GUI* gui;
     if ((gui = malloc(sizeof(GUI))) == NULL)
@@ -59,6 +58,7 @@ GUI* GUI_alloc_generic(int width, int height) {
     return gui;
 }
 
+
 /*
  * Non-content-aware default frame paint function (it paints all children with
  * no specified destination rectangle).
@@ -75,4 +75,21 @@ GUI* GUI_make_frame(int x, int y, int width, int height) {
     frame->paint = frame_paint;
 
     return frame;
+}
+
+
+void GUI_add_element(GUI* parent, GUI* element) {
+    // There are no child elements yet
+    if (parent->child == NULL) {
+        parent->child = element;
+        return;
+    }
+
+    // Find the last child element added
+    GUI* last_child = parent->child;
+    while (last_child->next != NULL)
+        last_child = last_child->next;
+
+    // Add the element to the end child
+    last_child->next = element;
 }

@@ -40,7 +40,6 @@ int main(int argc, char* args[]) {
     } else {
         window = SDL_CreateWindow("test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
-        GUI* frame = GUI_make_frame(0, 0, 640, 480);
         if (window == NULL) {
             printf("Errors, yo");
         } else {
@@ -55,14 +54,30 @@ int main(int argc, char* args[]) {
 
             surface = SDL_GetWindowSurface(window);
 
+            // GUI init
+            GUI* frame = GUI_make_frame(0, 0, 640, 480);
             frame->paint(frame);
 
             SDL_BlitSurface(frame->surface, NULL, surface, NULL);
             SDL_UpdateWindowSurface(window);
 
-            SDL_Delay(2000);
+            SDL_Event event;
+            while (1) {
+                while (SDL_PollEvent(&event)) {
+                    if (event.type == SDL_QUIT)
+                        goto quit;
+                }
+
+                // GUI test stuff
+                bool updated = GUI_Update(frame);
+                if (updated)
+                    printf("GUI redraw\n");
+
+                SDL_Delay(16);
+            }
         }
 
+    quit:
         GUI_free(frame);
     }
 
