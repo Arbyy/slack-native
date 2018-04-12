@@ -63,6 +63,7 @@ int main(int argc, char* args[]) {
             GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
 
             SDL_Event event;
+            int last_mousex = -1, last_mousey = -1;
             while (1) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT)
@@ -71,6 +72,11 @@ int main(int argc, char* args[]) {
                         MouseData* data = malloc(sizeof(MouseData));
                         if (data != NULL) {
                             SDL_GetMouseState(&data->x, &data->y);
+                            data->lastx = last_mousex;
+                            data->lasty = last_mousey;
+                            last_mousex = data->x;
+                            last_mousey = data->y;
+
                             GUI_trigger(frame, MOUSE_MOVED, data);
                             free(data);
                         }

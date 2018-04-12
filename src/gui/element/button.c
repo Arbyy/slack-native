@@ -28,18 +28,21 @@ static void paint(GUI* this) {
 static void* set_mouseover(GUI* this, void* data) {
     ButtonData* bdata = this->aux;
     bdata->mouseover = true;
+    this->dirty = true;
     return NULL;
 }
 
 static void* clear_mouseover(GUI* this, void* data) {
     ButtonData* bdata = this->aux;
     bdata->mouseover = false;
+    this->dirty = true;
     return NULL;
 }
 
 static void* set_mousedown(GUI* this, void* data) {
     ButtonData* bdata = this->aux;
     bdata->mousedown = true;
+    this->dirty = true;
     return NULL;
 }
 
@@ -47,6 +50,11 @@ static void* clear_mousedown(GUI* this, void* data) {
     // TODO: add actions when the mouse is released
     ButtonData* bdata = this->aux;
     bdata->mousedown = false;
+    this->dirty = true;
+    return NULL;
+}
+
+static void* mouse_moved(GUI* this, void* data) {
     return NULL;
 }
 
@@ -85,6 +93,7 @@ GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     GUI_when(this, MOUSE_EXITED, clear_mouseover);
     GUI_when(this, CLICKED, set_mousedown);
     GUI_when(this, RELEASED, clear_mousedown);
+    GUI_when(this, MOUSE_MOVED, mouse_moved);
 
     // We haven't been rendered before
     this->dirty = true;

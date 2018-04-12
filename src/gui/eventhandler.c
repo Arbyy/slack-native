@@ -30,7 +30,7 @@ void GUI_free_listener_coll(EventListenerCollection* coll) {
 
 bool GUI_when(GUI* element, EventType type, EventHandler handler) {
     EventListener* listener;
-    if ((listener = malloc(sizeof(EventListener))) != NULL)
+    if ((listener = malloc(sizeof(EventListener))) == NULL)
         return false;
 
     listener->type = type;
@@ -38,11 +38,16 @@ bool GUI_when(GUI* element, EventType type, EventHandler handler) {
     listener->next = NULL;
 
     // Add constructed listener to listener collection
-    EventListener* end = element->listeners->first;
-    while (end->next != NULL)
-        end = end->next;
+    if (element->listeners->first == NULL)
+        element->listeners->first = listener;
+    else {
+        EventListener* end = element->listeners->first;
+        while (end->next != NULL)
+            end = end->next;
 
-    end->next = listener;
+        end->next = listener;
+    }
+
     element->listeners->count++;
 
     return true;

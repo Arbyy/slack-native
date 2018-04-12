@@ -57,8 +57,9 @@ typedef struct event_listener_coll_t {
  * `CLICKED`, `RELEASED`.
  */
 typedef struct mouse_data_t {
-    int x, y;   /* used by all mouse events */
-    int button; /* only for `CLICKED`/`RELEASED` */
+    int x, y;         /* used by all mouse events */
+    int lastx, lasty; /* only for `MOUSE_MOVED` */
+    int button;       /* only for `CLICKED`/`RELEASED` */
 } MouseData;
 
 /*
