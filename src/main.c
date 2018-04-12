@@ -62,13 +62,17 @@ int main(int argc, char* args[]) {
             GUI* frame = GUI_simple_layout(GUI_make_frame(0, 0, 640, 480));
             GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
 
+            // TODO: move GUI related event listeners to a separate function,
+            // probably in eventhandler.h
             SDL_Event event;
             int last_mousex = -1, last_mousey = -1;
             while (1) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT)
                         goto quit;
-                    if (event.type == SDL_MOUSEMOTION) {
+                    if (event.type == SDL_MOUSEMOTION ||
+                        event.type == SDL_MOUSEBUTTONDOWN ||
+                        event.type == SDL_MOUSEBUTTONUP) {
                         MouseData* data = malloc(sizeof(MouseData));
                         if (data != NULL) {
                             SDL_GetMouseState(&data->x, &data->y);
@@ -77,7 +81,18 @@ int main(int argc, char* args[]) {
                             last_mousex = data->x;
                             last_mousey = data->y;
 
-                            GUI_trigger(frame, MOUSE_MOVED, data);
+                            switch (event.type) {
+                            case SDL_MOUSEMOTION:
+                                GUI_trigger(frame, MOUSE_MOVED, data);
+                                break;
+                            case SDL_MOUSEBUTTONDOWN:
+                                GUI_trigger(frame, CLICKED, data);
+                                break;
+                            case SDL_MOUSEBUTTONUP:
+                                GUI_trigger(frame, RELEASED, data);
+                                break;
+                            }
+
                             free(data);
                         }
                     }

@@ -39,43 +39,82 @@ SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 
 
 
 /*
+ * Copies the data in `original` into a new struct (make sure to free the return
+ * value of this when you're done), and offsets the mouse coordinates so that
+ * the position 0, 0 is the very top left of this frame.
+ */
+static MouseData* generate_offset_mousedata(GUI* this, MouseData* original) {
+    MouseData* mdata = malloc(sizeof(MouseData));
+    if (mdata == NULL)
+        return NULL;
+
+    // Copy supplied event data to new struct
+    memcpy(mdata, original, sizeof(MouseData));
+
+    // Create relative coordinates
+    mdata->x -= this->x;
+    mdata->y -= this->y;
+    mdata->lastx -= this->x;
+    mdata->lasty -= this->y;
+
+    return mdata;
+}
+
+
+/*
  * Finds all elements that either the current or last mouse position are under,
  * and triggers the `MOUSE_MOVED` event on them, with the position of the
  * frame pointed to by *this subtracted from the mouse coordinates.
  */
 static void* mouse_moved(GUI* this, void* data) {
-    MouseData* mdata = malloc(sizeof(MouseData));
+    MouseData* mdata = generate_offset_mousedata(this, (MouseData*) data);
 
     if (mdata != NULL) {
-        // Copy supplied event data to new struct
-        memcpy(mdata, data, sizeof(MouseData));
-
-        // Create relative coordinates
-        mdata->x -= this->x;
-        mdata->y -= this->y;
-        mdata->lastx -= this->x;
-        mdata->lasty -= this->y;
-
         GUI* child = this->child;
         while (child != NULL) {
-            if (mouse_event_is_inside(child, mdata) ||
-                mouse_event_was_inside(child, mdata)) {
-                GUI_trigger(child, MOUSE_MOVED, mdata);
-            }
+            GUI_trigger_mouse_events(child, mdata);
 
-            if (mouse_event_is_inside(child, mdata) &&
-                !mouse_event_was_inside(child, mdata)) {
-                GUI_trigger(child, MOUSE_ENTERED, mdata);
-            }
+            child = this->next;
+        }
+    }
 
-            if (mouse_event_was_inside(child, mdata) &&
-                !mouse_event_is_inside(child, mdata)) {
-                GUI_trigger(child, MOUSE_EXITED, mdata);
+    free(mdata);
+}
+
+
+static void* mouse_clicked(GUI* this, void* data) {
+    MouseData* mdata = generate_offset_mousedata(this, (MouseData*) data);
+
+    if (mdata != NULL) {
+        GUI* child = this->child;
+        while (child != NULL) {
+            if (mouse_event_is_inside(child, mdata)) {
+                GUI_trigger(child, CLICKED, mdata);
             }
 
             child = this->next;
         }
     }
+
+    free(mdata);
+}
+
+
+static void* mouse_released(GUI* this, void* data) {
+    MouseData* mdata = generate_offset_mousedata(this, (MouseData*) data);
+
+    if (mdata != NULL) {
+        GUI* child = this->child;
+        while (child != NULL) {
+            if (mouse_event_is_inside(child, mdata)) {
+                GUI_trigger(child, RELEASED, mdata);
+            }
+
+            child = this->next;
+        }
+    }
+
+    free(mdata);
 }
 
 
@@ -83,6 +122,8 @@ GUI* GUI_simple_layout(GUI* frame) {
     frame->paint = paint;
 
     GUI_when(frame, MOUSE_MOVED, mouse_moved);
+    GUI_when(frame, CLICKED, mouse_clicked);
+    GUI_when(frame, RELEASED, mouse_released);
 
     return frame;
 }
