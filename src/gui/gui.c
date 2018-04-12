@@ -17,6 +17,8 @@ void GUI_free(GUI* elem) {
     GUI_free_listener_coll(elem->listeners);
     SDL_FreeSurface(elem->surface);
 
+    if (elem->auxfree != NULL)
+        elem->auxfree(elem->aux);
     if (elem->aux != NULL)
         free(elem->aux);
     free(elem);
@@ -30,6 +32,7 @@ GUI* GUI_alloc_generic(int width, int height) {
     // Clear all pointer fields
     gui->listeners = NULL;
     gui->surface = NULL;
+    gui->auxfree = NULL;
     gui->style = NULL;
     gui->paint = NULL;
     gui->child = NULL;
@@ -63,16 +66,23 @@ GUI* GUI_alloc_generic(int width, int height) {
  * Non-content-aware default frame paint function (it paints all children with
  * no specified destination rectangle).
  */
-static void frame_paint(GUI* this) {
-    // yeeeeeaaaahhhhhh
-    SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0, 0));
+static void fallback_frame_paint(GUI* this) {
+    SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
+
+    GUI* child = this->child;
+    while (child != NULL) {
+        SDL_BlitSurface(child->surface, NULL, this->surface, NULL);
+        child = child->next;
+    }
+
+    this->dirty = false;
 }
 
 GUI* GUI_make_frame(int x, int y, int width, int height) {
     GUI* frame = GUI_alloc_generic(width, height);
 
     frame->type = FRAME;
-    frame->paint = frame_paint;
+    frame->paint = fallback_frame_paint;
 
     return frame;
 }
@@ -92,4 +102,39 @@ void GUI_add_element(GUI* parent, GUI* element) {
 
     // Add the element to the end child
     last_child->next = element;
+}
+
+
+void GUI_paint(GUI* element) {
+    // Paint children before painting the parent
+    GUI* child = element->child;
+    while (child != NULL) {
+        GUI_paint(child);
+        child = child->next;
+    }
+
+    element->paint(element);
+}
+
+
+bool GUI_update(GUI* root) {
+    // If this element is dirty, paint all children, then paint this element
+    if (root->dirty) {
+        GUI_paint(root);
+        return true;
+    }
+
+    bool dirty = false;
+    GUI* child = root->child;
+
+    // If any child is dirty, the parent is also dirty
+    while (child != NULL) {
+        dirty |= GUI_update(child);
+        child = child->next;
+    }
+
+    if (dirty)
+        root->paint(root);
+
+    return dirty;
 }

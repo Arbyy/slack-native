@@ -19,6 +19,9 @@ typedef struct gui_t GUI;
 /* Function called on elements to paint them, taking an argument, which is the
    element to paint */
 typedef void (*PaintFunc)(GUI* this);
+/* Function called when GUI structs have an *aux struct which has fields that
+   need freeing (NOTE: auxfree must not free the aux struct itself) */
+typedef void (*AuxFreeFunc)(void* aux);
 
 struct gui_t {
     int x,y, width,height;
@@ -35,6 +38,7 @@ struct gui_t {
     GUI *child, *next;
 
     /* Element type specific data */
+    AuxFreeFunc auxfree;
     void *aux;
 };
 

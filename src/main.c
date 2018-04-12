@@ -14,6 +14,7 @@ Super simple main file just to test all of the dependencies.
 #include <libwebsockets/libwebsockets.h>
 #undef main
 
+#include "gui/element/button.h"
 #include "gui/gui.h"
 
 const int SCREEN_WIDTH = 640;
@@ -56,10 +57,7 @@ int main(int argc, char* args[]) {
 
             // GUI init
             GUI* frame = GUI_make_frame(0, 0, 640, 480);
-            frame->paint(frame);
-
-            SDL_BlitSurface(frame->surface, NULL, surface, NULL);
-            SDL_UpdateWindowSurface(window);
+            GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
 
             SDL_Event event;
             while (1) {
@@ -69,16 +67,22 @@ int main(int argc, char* args[]) {
                 }
 
                 // GUI test stuff
-                bool updated = GUI_Update(frame);
-                if (updated)
+                bool updated = GUI_update(frame);
+                if (updated) {
+                    SDL_FillRect(surface, NULL, 0);
+
+                    SDL_BlitSurface(frame->surface, NULL, surface, NULL);
+                    SDL_UpdateWindowSurface(window);
+
                     printf("GUI redraw\n");
+                }
 
                 SDL_Delay(16);
             }
-        }
 
-    quit:
-        GUI_free(frame);
+        quit:
+            GUI_free(frame);
+        }
     }
 
     SDL_DestroyWindow(window);
