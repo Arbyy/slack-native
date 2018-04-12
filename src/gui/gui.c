@@ -29,6 +29,12 @@ GUI* GUI_alloc_generic(int width, int height) {
     if ((gui = malloc(sizeof(GUI))) == NULL)
         return NULL;
 
+    // Clear dimensions
+    gui->x = 0;
+    gui->y = 0;
+    gui->width = width;
+    gui->height = height;
+
     // Clear all pointer fields
     gui->listeners = NULL;
     gui->surface = NULL;
@@ -67,6 +73,7 @@ GUI* GUI_alloc_generic(int width, int height) {
  * no specified destination rectangle).
  */
 static void fallback_frame_paint(GUI* this) {
+    // Clear surface
     SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
 
     GUI* child = this->child;

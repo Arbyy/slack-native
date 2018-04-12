@@ -16,6 +16,7 @@ Super simple main file just to test all of the dependencies.
 #undef main
 
 #include "gui/element/button.h"
+#include "gui/layout/simple.h"
 #include "gui/eventhandler.h"
 #include "gui/gui.h"
 
@@ -58,7 +59,7 @@ int main(int argc, char* args[]) {
             surface = SDL_GetWindowSurface(window);
 
             // GUI init
-            GUI* frame = GUI_make_frame(0, 0, 640, 480);
+            GUI* frame = GUI_simple_layout(GUI_make_frame(0, 0, 640, 480));
             GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
 
             SDL_Event event;

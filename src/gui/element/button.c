@@ -59,6 +59,8 @@ static void auxfree(void* aux) {
 
 GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     GUI* this = GUI_alloc_generic(width, height);
+    this->x = x;
+    this->y = y;
 
     this->type = BUTTON;
     this->paint = paint;
