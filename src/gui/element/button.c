@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <SDL2/SDL.h>
+
 #include "../eventhandler.h"
 #include "../gui.h"
 #include "button.h"
@@ -35,6 +37,7 @@ static void* set_mouseover(GUI* this, void* data) {
 static void* clear_mouseover(GUI* this, void* data) {
     ButtonData* bdata = this->aux;
     bdata->mouseover = false;
+    bdata->mousedown = false; // Cancel click
     this->dirty = true;
     return NULL;
 }

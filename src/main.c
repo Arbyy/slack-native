@@ -16,6 +16,7 @@ Super simple main file just to test all of the dependencies.
 #undef main
 
 #include "gui/element/button.h"
+#include "gui/element/label.h"
 #include "gui/layout/simple.h"
 #include "gui/eventhandler.h"
 #include "gui/gui.h"
@@ -59,10 +60,14 @@ int main(int argc, char* args[]) {
             surface = SDL_GetWindowSurface(window);
 
             // GUI init
+            TTF_Font* default_font = TTF_OpenFont("NotoSans-Regular.ttf", 14);
+            GUI_label_set_default_font(default_font);
+
             GUI* frame = GUI_simple_layout(GUI_make_frame(0, 0, 640, 480));
             GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
             GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2"));
             GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3"));
+            GUI_add_element(frame, GUI_make_label(50, 350, 150, 24, "This is a test string."));
 
 
             // TODO: move GUI related event listeners to a separate function,
@@ -117,6 +122,8 @@ int main(int argc, char* args[]) {
 
         quit:
             GUI_free(frame);
+            TTF_CloseFont(default_font);
+            default_font = NULL;
         }
     }
 
