@@ -92,6 +92,9 @@ CURLcode slacknet_send_post(char* url, char* params, SlacknetDataBuffer* data);
  * body as per the Slack API rules. More info on why this is can be found on
  * https://api.slack.com/web.
  *
+ * The token argument is optional, if it is set to NULL, the Authorization
+ * header will be omitted from the request entirely.
+ *
  * NOTE: Just like slacknet_send_post, this function assumes the existence of
  * the file "cacert.pem" in the same directory as the executable.
  */ 

@@ -109,15 +109,17 @@ CURLcode slacknet_send_post(char* url, char* params, SlacknetDataBuffer* data) {
 CURLcode
 slacknet_send_post_json(char* url, char* token, cJSON* params,
                         SlacknetDataBuffer* data) {
-    // 23 because that is the size of "Authorization: Bearer " exactly.
-    // Add 1 specifically for the null terminator
-    char* authheader = malloc(23 + strlen(token) + 1);
-    strcpy(authheader, "Authorization: Bearer ");
-    strcat(authheader, token);
-    
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-type: application/json");
-    headers = curl_slist_append(headers, authheader);
+    char* authheader;
+    if (token) {
+        // 23 because that is the size of "Authorization: Bearer " exactly.
+        // Add 1 specifically for the null terminator
+        authheader = malloc(23 + strlen(token) + 1);
+        strcpy(authheader, "Authorization: Bearer ");
+        strcat(authheader, token);
+        headers = curl_slist_append(headers, authheader);
+    }
     headers = curl_slist_append(headers, "charsets: utf-8");
 
     char* jsonbody = cJSON_PrintUnformatted(params);
@@ -133,6 +135,7 @@ slacknet_send_post_json(char* url, char* token, cJSON* params,
     CURLcode result = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
 
+    curl_slist_free_all(headers);
     free(jsonbody);
     free(authheader);
 
