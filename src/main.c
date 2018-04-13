@@ -61,6 +61,9 @@ int main(int argc, char* args[]) {
             // GUI init
             GUI* frame = GUI_simple_layout(GUI_make_frame(0, 0, 640, 480));
             GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
+            GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2"));
+            GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3"));
+
 
             // TODO: move GUI related event listeners to a separate function,
             // probably in eventhandler.h

@@ -6,14 +6,13 @@
 
 #include <stdbool.h>
 
-#include "eventhandler.h"
 #include "event.h"
 #include "gui.h"
 
 /*
  * Returns whether or not the current mouse coordinates are inside an element.
  */
-extern inline bool mouse_event_is_inside(GUI* element, MouseData* event) {
+static inline bool mouse_event_is_inside(GUI* element, MouseData* event) {
     // x and y coordinates of far side of element (i.e. bottom right corner)
     int element_rx = element->x + element->width,
         element_ry = element->y + element->height;
@@ -25,7 +24,7 @@ extern inline bool mouse_event_is_inside(GUI* element, MouseData* event) {
 /*
  * Returns whether or not the last mouse coordinates were inside an element.
  */
-extern inline bool mouse_event_was_inside(GUI* element, MouseData* event) {
+static inline bool mouse_event_was_inside(GUI* element, MouseData* event) {
     // x and y coordinates of far side of element (i.e. bottom right corner)
     int element_rx = element->x + element->width,
         element_ry = element->y + element->height;
@@ -42,21 +41,6 @@ extern inline bool mouse_event_was_inside(GUI* element, MouseData* event) {
  * that 0, 0 aligns with the top left of the parent container of the element
  * supplied.
  */
-extern inline bool GUI_trigger_mouse_events(GUI* element, MouseData* event) {
-    if (mouse_event_is_inside(element, event) ||
-        mouse_event_was_inside(element, event)) {
-        GUI_trigger(element, MOUSE_MOVED, event);
-    }
-
-    if (mouse_event_is_inside(element, event) &&
-        !mouse_event_was_inside(element, event)) {
-        GUI_trigger(element, MOUSE_ENTERED, event);
-    }
-
-    if (mouse_event_was_inside(element, event) &&
-        !mouse_event_is_inside(element, event)) {
-        GUI_trigger(element, MOUSE_EXITED, event);
-    }
-}
+bool GUI_trigger_mouse_events(GUI* element, MouseData* event);
 
 #endif

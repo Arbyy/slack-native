@@ -74,7 +74,7 @@ static void* mouse_moved(GUI* this, void* data) {
         while (child != NULL) {
             GUI_trigger_mouse_events(child, mdata);
 
-            child = this->next;
+            child = child->next;
         }
     }
 
@@ -92,7 +92,7 @@ static void* mouse_clicked(GUI* this, void* data) {
                 GUI_trigger(child, CLICKED, mdata);
             }
 
-            child = this->next;
+            child = child->next;
         }
     }
 
@@ -110,7 +110,7 @@ static void* mouse_released(GUI* this, void* data) {
                 GUI_trigger(child, RELEASED, mdata);
             }
 
-            child = this->next;
+            child = child->next;
         }
     }
 
