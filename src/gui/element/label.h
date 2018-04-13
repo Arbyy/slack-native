@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL_ttf.h>
 
+#include "../gui.h"
+
 typedef struct label_data_t {
     char* label;
     TTF_Font* font;

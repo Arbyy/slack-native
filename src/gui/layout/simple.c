@@ -15,7 +15,7 @@
  */
 static void paint(GUI* this) {
     // Clear surface
-SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
+    SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
 
     SDL_Rect* dest = malloc(sizeof(SDL_Rect));
 
@@ -32,6 +32,8 @@ SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 
 
             child = child->next;
         }
+
+        free(dest);
     }
 
     this->dirty = false;

@@ -25,8 +25,20 @@ static void paint(GUI* this) {
     if (!text) {
         printf("SDL_ttf error rendering while rendering label:\n%s\n", TTF_GetError());
     } else {
-        SDL_BlitSurface(text, NULL, this->surface, NULL);
-        SDL_FreeSurface(text);
+        SDL_Rect* dest = malloc(sizeof(SDL_Rect));
+
+        if (dest != NULL) {
+            // Center text in label area
+            dest->x = this->surface->w / 2 - text->w / 2;
+            dest->y = this->surface->h / 2 - text->h / 2;
+            dest->w = text->w;
+            dest->h = text->h;
+
+            SDL_BlitSurface(text, NULL, this->surface, dest);
+            SDL_FreeSurface(text);
+
+            free(dest);
+        }
     }
 
     this->dirty = false;

@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "../element/label.h"
 #include "../eventhandler.h"
 #include "../gui.h"
 #include "button.h"
@@ -23,6 +24,9 @@ static void paint(GUI* this) {
     }
 
     SDL_FillRect(this->surface, NULL, fill_colour);
+
+    // Blit label onto button
+    SDL_BlitSurface(this->child->surface, NULL, this->surface, NULL);
 
     this->dirty = false;
 }
@@ -61,13 +65,6 @@ static void* mouse_moved(GUI* this, void* data) {
     return NULL;
 }
 
-static void auxfree(void* aux) {
-    ButtonData* data = aux;
-
-    if (data->label != NULL)
-        free(data->label);
-}
-
 GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     GUI* this = GUI_alloc_generic(width, height);
     this->x = x;
@@ -83,13 +80,9 @@ GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     data->mouseover = false;
     data->mousedown = false;
 
-    // Copy supplied label into aux struct
-    data->label = malloc(sizeof(char) * (strlen(label) + 1));
-    if (data->label != NULL)
-        strcpy(data->label, label);
-
-    // Set function for cleaning up the aux struct
-    this->auxfree = auxfree;
+    // Create label and add it to the button
+    GUI* label_elem = GUI_make_label(x, y, width, height, label);
+    this->child = label_elem;
 
     // Add default event listeners
     GUI_when(this, MOUSE_ENTERED, set_mouseover);

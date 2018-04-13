@@ -6,7 +6,6 @@
 #include "../gui.h"
 
 typedef struct button_data_t {
-    char* label;
     bool mouseover, mousedown; /* Controls rendering effects */
 } ButtonData;
 
