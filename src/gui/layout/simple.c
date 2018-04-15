@@ -22,23 +22,18 @@ static void paint(GUI* this) {
         SDL_FillRect(this->surface, NULL,
                      SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
 
-    SDL_Rect* dest = malloc(sizeof(SDL_Rect));
+    SDL_Rect dest;
+    GUI* child = this->child;
+    while (child != NULL) {
+        // Literally just stick the GUI element where it tells us to
+        dest.x = child->x;
+        dest.y = child->y;
+        dest.w = child->width;
+        dest.h = child->height;
 
-    if (dest != NULL) {
-        GUI* child = this->child;
-        while (child != NULL) {
-            // Literally just stick the GUI element where it tells us to
-            dest->x = child->x;
-            dest->y = child->y;
-            dest->w = child->width;
-            dest->h = child->height;
+        SDL_BlitSurface(child->surface, NULL, this->surface, &dest);
 
-            SDL_BlitSurface(child->surface, NULL, this->surface, dest);
-
-            child = child->next;
-        }
-
-        free(dest);
+        child = child->next;
     }
 
     this->dirty = false;

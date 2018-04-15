@@ -16,7 +16,7 @@ static void paint(GUI* this) {
 }
 
 
-static void* resize(GUI* this, ResizeData* data) {
+static void* resize(GUI* this, void* data) {
     // TODO: adjust layout of elements here
     return NULL;
 }

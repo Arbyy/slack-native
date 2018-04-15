@@ -26,6 +26,22 @@ void GUI_free(GUI* elem) {
     free(elem);
 }
 
+static void* resize_surface(GUI* this, void* data) {
+    SDL_FreeSurface(this->surface);
+    this->surface = NULL;
+
+    this->surface = SDL_CreateRGBSurface(0, this->width, this->height, 32,
+                                         0xFF000000,
+                                         0x00FF0000,
+                                         0x0000FF00,
+                                         0x000000FF);
+
+    // This element must be redrawn, as we replaced its surface with a new one
+    this->dirty = true;
+
+    return NULL;
+}
+
 GUI* GUI_alloc_generic(int width, int height) {
     GUI* gui;
     if ((gui = malloc(sizeof(GUI))) == NULL)
@@ -62,6 +78,9 @@ GUI* GUI_alloc_generic(int width, int height) {
         GUI_free(gui);
         return NULL;
     }
+
+    // Add default event listeners
+    GUI_when(gui, RESIZED, resize_surface);
 
     // Set dirty because the new GUI element hasn't been rendered yet
     gui->dirty = true;

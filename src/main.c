@@ -77,13 +77,17 @@ int main(int argc, char* args[]) {
             GUI_add_element(frame, GUI_make_label(50, 350, 150, 24, "This is a test string."));
 
 
-            // TODO: move GUI related event listeners to a separate function,
-            // probably in eventhandler.h
             SDL_Event event;
             while (1) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT)
                         goto quit;
+
+                    if (event.type == SDL_WINDOWEVENT &&
+                        (event.window.event == SDL_WINDOWEVENT_RESIZED ||
+                         event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED))
+                        // Obtain a new window surface whenever the window is resized
+                        surface = SDL_GetWindowSurface(window);
 
                     GUI_SDL_event_handler(frame, &event);
                 }
@@ -95,8 +99,6 @@ int main(int argc, char* args[]) {
 
                     SDL_BlitSurface(frame->surface, NULL, surface, NULL);
                     SDL_UpdateWindowSurface(window);
-
-                    printf("GUI redraw\n");
                 }
 
                 SDL_Delay(16);

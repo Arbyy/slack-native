@@ -62,11 +62,4 @@ typedef struct mouse_data_t {
     int button;       /* only for `CLICKED`/`RELEASED` */
 } MouseData;
 
-/*
- * Data supplied for `RESIZED` events.
- */
-typedef struct resize_data_t {
-    int width, height; // New max width and height of element
-} ResizeData;
-
 #endif
