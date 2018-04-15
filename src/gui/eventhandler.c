@@ -1,5 +1,7 @@
 #include <stdbool.h>
 
+#include <SDL2/SDL.h>
+
 #include "eventhandler.h"
 #include "event.h"
 #include "gui.h"
@@ -67,4 +69,33 @@ bool GUI_trigger(GUI* root, EventType event, void* data) {
     }
 
     return found_any;
+}
+
+
+static int last_mousex = -1, last_mousey = -1;
+void GUI_SDL_event_handler(GUI* frame, SDL_Event* event) {
+    if (event->type == SDL_MOUSEMOTION ||
+        event->type == SDL_MOUSEBUTTONDOWN ||
+        event->type == SDL_MOUSEBUTTONUP) {
+
+        MouseData data;
+
+        SDL_GetMouseState(&data.x, &data.y);
+        data.lastx = last_mousex;
+        data.lasty = last_mousey;
+        last_mousex = data.x;
+        last_mousey = data.y;
+
+        switch (event->type) {
+        case SDL_MOUSEMOTION:
+            GUI_trigger(frame, MOUSE_MOVED, &data);
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            GUI_trigger(frame, CLICKED, &data);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            GUI_trigger(frame, RELEASED, &data);
+            break;
+        }
+    }
 }

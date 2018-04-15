@@ -4,6 +4,7 @@ Super simple main file just to test all of the dependencies.
 
 */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -22,8 +23,8 @@ Super simple main file just to test all of the dependencies.
 #include "gui/style.h"
 #include "gui/gui.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+int SCREEN_WIDTH = 640;
+int SCREEN_HEIGHT = 480;
 
 int main(int argc, char* args[]) {
     lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, NULL);
@@ -44,7 +45,8 @@ int main(int argc, char* args[]) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
         printf("Errors");
     } else {
-        window = SDL_CreateWindow("test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        uint32_t window_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+        window = SDL_CreateWindow("test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, window_flags);
 
         if (window == NULL) {
             printf("Errors, yo");
@@ -78,37 +80,12 @@ int main(int argc, char* args[]) {
             // TODO: move GUI related event listeners to a separate function,
             // probably in eventhandler.h
             SDL_Event event;
-            int last_mousex = -1, last_mousey = -1;
             while (1) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT)
                         goto quit;
-                    if (event.type == SDL_MOUSEMOTION ||
-                        event.type == SDL_MOUSEBUTTONDOWN ||
-                        event.type == SDL_MOUSEBUTTONUP) {
-                        MouseData* data = malloc(sizeof(MouseData));
-                        if (data != NULL) {
-                            SDL_GetMouseState(&data->x, &data->y);
-                            data->lastx = last_mousex;
-                            data->lasty = last_mousey;
-                            last_mousex = data->x;
-                            last_mousey = data->y;
 
-                            switch (event.type) {
-                            case SDL_MOUSEMOTION:
-                                GUI_trigger(frame, MOUSE_MOVED, data);
-                                break;
-                            case SDL_MOUSEBUTTONDOWN:
-                                GUI_trigger(frame, CLICKED, data);
-                                break;
-                            case SDL_MOUSEBUTTONUP:
-                                GUI_trigger(frame, RELEASED, data);
-                                break;
-                            }
-
-                            free(data);
-                        }
-                    }
+                    GUI_SDL_event_handler(frame, &event);
                 }
 
                 // GUI test stuff

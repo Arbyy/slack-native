@@ -6,6 +6,8 @@
 
 #include <stdbool.h>
 
+#include <SDL2/SDL.h>
+
 #include "gui.h"
 #include "event.h"
 
@@ -39,5 +41,11 @@ bool GUI_when(GUI* element, EventType type, EventHandler handler);
  * fired.
  */
 bool GUI_trigger(GUI* root, EventType event, void* data);
+
+/*
+ * This function should be inserted into the "while (SDL_PollEvent())" loop to
+ * handle events relevant to GUI code.
+ */
+void GUI_SDL_event_handler(GUI* frame, SDL_Event* event);
 
 #endif
