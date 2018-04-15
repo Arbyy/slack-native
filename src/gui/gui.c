@@ -5,6 +5,7 @@
 
 #include "eventhandler.h"
 #include "event.h"
+#include "style.h"
 #include "gui.h"
 
 
@@ -19,8 +20,9 @@ void GUI_free(GUI* elem) {
 
     if (elem->auxfree != NULL)
         elem->auxfree(elem->aux);
-    if (elem->aux != NULL)
-        free(elem->aux);
+
+    free(elem->style);
+    free(elem->aux);
     free(elem);
 }
 
@@ -74,7 +76,12 @@ GUI* GUI_alloc_generic(int width, int height) {
  */
 static void fallback_frame_paint(GUI* this) {
     // Clear surface
-    SDL_FillRect(this->surface, NULL, SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
+    if (this->style != NULL)
+        SDL_FillRect(this->surface, NULL, GUI_map_colour(this->surface->format,
+                                                         this->style->bg));
+    else
+        SDL_FillRect(this->surface, NULL,
+                     SDL_MapRGB(this->surface->format, 0xFF, 0xFF, 0xFF));
 
     GUI* child = this->child;
     while (child != NULL) {

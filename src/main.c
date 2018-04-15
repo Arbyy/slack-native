@@ -19,6 +19,7 @@ Super simple main file just to test all of the dependencies.
 #include "gui/element/label.h"
 #include "gui/layout/simple.h"
 #include "gui/eventhandler.h"
+#include "gui/style.h"
 #include "gui/gui.h"
 
 const int SCREEN_WIDTH = 640;
@@ -64,6 +65,10 @@ int main(int argc, char* args[]) {
             GUI_label_set_default_font(default_font);
 
             GUI* frame = GUI_simple_layout(GUI_make_frame(0, 0, 640, 480));
+            frame->style = malloc(sizeof(GUIStyle));
+            frame->style->bg = 0xFFDDDDDD;
+            printf("%i\n", GUI_map_colour(frame->surface->format, 0x00FF00));
+
             GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
             GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2"));
             GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3"));
