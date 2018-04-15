@@ -4,6 +4,7 @@ Super simple main file just to test all of the dependencies.
 
 */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,6 +20,7 @@ Super simple main file just to test all of the dependencies.
 #include "gui/element/button.h"
 #include "gui/element/label.h"
 #include "gui/layout/simple.h"
+#include "gui/layout/split.h"
 #include "gui/eventhandler.h"
 #include "gui/style.h"
 #include "gui/gui.h"
@@ -66,15 +68,22 @@ int main(int argc, char* args[]) {
             TTF_Font* default_font = TTF_OpenFont("NotoSans-Regular.ttf", 14);
             GUI_label_set_default_font(default_font);
 
-            GUI* frame = GUI_simple_layout(GUI_make_frame(0, 0, 640, 480));
-            frame->style = malloc(sizeof(GUIStyle));
-            frame->style->bg = 0xFFDDDDDD;
-            printf("%i\n", GUI_map_colour(frame->surface->format, 0x00FF00));
+            GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
+                                          VERTICAL, LEFT, 220, PIXELS, false);
 
-            GUI_add_element(frame, GUI_make_button(20, 20, 100, 30, "test"));
-            GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2"));
-            GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3"));
-            GUI_add_element(frame, GUI_make_label(50, 350, 150, 24, "This is a test string."));
+            GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
+            sidebar->style = malloc(sizeof(GUIStyle));
+            sidebar->style->bg = 0xFF333333;
+            GUI_add_element(frame, sidebar);
+
+            GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
+            GUI_add_element(frame, content);
+
+            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, "test"));
+            /* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); */
+            /* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); */
+            /* GUI_add_element(frame, GUI_make_label(50, 350, 150, 24, "This is a test string.")); */
+            GUI_prepare(frame);
 
 
             SDL_Event event;

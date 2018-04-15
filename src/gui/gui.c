@@ -171,3 +171,11 @@ bool GUI_update(GUI* root) {
 
     return dirty;
 }
+
+
+void GUI_prepare(GUI* root) {
+    // Allows layout managers to update before the GUI is drawn for the first
+    // time. Otherwise, the window would have to be resized before the GUI is
+    // drawn properly...
+    GUI_trigger(root, RESIZED, NULL);
+}

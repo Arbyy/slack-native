@@ -95,4 +95,11 @@ void GUI_paint(GUI* element);
  */
 bool GUI_update(GUI* root);
 
+/*
+ * Called on a freshly constructed GUI, before it is rendered for the first
+ * time. Does some basic setup, such as calling some event handlers to allow
+ * layouts to work themselves out.
+ */
+void GUI_prepare(GUI* root);
+
 #endif

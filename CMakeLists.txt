@@ -34,6 +34,8 @@ if(UNIX)
     find_library(avcodec_lib NAMES avcodec)
     find_library(avformat_lib NAMES avformat)
     find_library(websockets_lib NAMES websockets)
+    # Don't know how to do this on windows :( we need it for math.h
+    find_library(math_lib NAMES m)
 ENDIF()
 
 target_link_libraries(slack-native ${SDL2_lib}
@@ -43,4 +45,5 @@ target_link_libraries(slack-native ${SDL2_lib}
                                    ${cURL_lib}
                                    ${avcodec_lib}
                                    ${avformat_lib}
-                                   ${websockets_lib})
+                                   ${websockets_lib}
+                                   ${math_lib})

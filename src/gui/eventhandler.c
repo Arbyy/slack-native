@@ -73,28 +73,27 @@ bool GUI_trigger(GUI* root, EventType event, void* data) {
 
 
 static int last_mousex = -1, last_mousey = -1;
+static MouseData mdata;
 void GUI_SDL_event_handler(GUI* frame, SDL_Event* event) {
-    MouseData data;
-
     switch (event->type) {
     case SDL_MOUSEMOTION:
     case SDL_MOUSEBUTTONDOWN:
     case SDL_MOUSEBUTTONUP:
-        SDL_GetMouseState(&data.x, &data.y);
-        data.lastx = last_mousex;
-        data.lasty = last_mousey;
-        last_mousex = data.x;
-        last_mousey = data.y;
+        SDL_GetMouseState(&mdata.x, &mdata.y);
+        mdata.lastx = last_mousex;
+        mdata.lasty = last_mousey;
+        last_mousex = mdata.x;
+        last_mousey = mdata.y;
 
         switch (event->type) {
         case SDL_MOUSEMOTION:
-            GUI_trigger(frame, MOUSE_MOVED, &data);
+            GUI_trigger(frame, MOUSE_MOVED, &mdata);
             break;
         case SDL_MOUSEBUTTONDOWN:
-            GUI_trigger(frame, CLICKED, &data);
+            GUI_trigger(frame, CLICKED, &mdata);
             break;
         case SDL_MOUSEBUTTONUP:
-            GUI_trigger(frame, RELEASED, &data);
+            GUI_trigger(frame, RELEASED, &mdata);
             break;
         }
 
