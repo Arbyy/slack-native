@@ -66,6 +66,9 @@ typedef struct split_layout_data_t {
  * Attaches event listeners to handle resizing children when the frame is
  * resized, in correlation with the size constraints passed to this function.
  *
+ * If more than two elements are added to a split layout, the additional items
+ * will be ignored.
+ *
  * NOTE: adjustable split layouts are not yet implemented.
  */
 GUI* GUI_split_layout(GUI* frame, SplitAxis axis, SplitSide fixed_side,

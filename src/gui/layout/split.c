@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <string.h>
 #include <math.h>
 
 #include <SDL2/SDL.h>
@@ -75,6 +76,11 @@ static void* resize_children(GUI* this, void* data) {
             *adjust_axis = fixed_elem_size;
         }
 
+        // Set x and y to 0, as the mouse event handler in this file handles
+        // shifting coordinates instead
+        fixed_elem->x = 0;
+        fixed_elem->y = 0;
+
         // Make the fixed element resize its children, too
         GUI_trigger(fixed_elem, RESIZED, NULL);
     }
@@ -90,11 +96,68 @@ static void* resize_children(GUI* this, void* data) {
             expanded_elem->width = frame_size - fixed_elem_size;
         }
 
+        // Set x and y to 0, as the mouse event handler in this file handles
+        // shifting coordinates instead
+        expanded_elem->x = 0;
+        expanded_elem->y = 0;
+
         // Notify the element that it has been resized
         GUI_trigger(expanded_elem, RESIZED, NULL);
     }
 
     return NULL;
+}
+
+
+/*
+ * Tracks down what child the mouse was or is over (if any), and if it was/is,
+ * forwards the mouse event to it.
+ */
+static void generic_mouse_event_forward(GUI* this, void* data, EventType e) {
+    if (this->child == NULL || this->child->next == NULL)
+        return;
+
+    SplitLayoutData* sdata = this->aux;
+
+    MouseData* mdata = malloc(sizeof(MouseData));
+    if (mdata == NULL)
+        return;
+
+    // Duplicate mouse data
+    memcpy(mdata, data, sizeof(MouseData));
+
+    if (sdata->axis == HORIZONTAL) {
+        if (mdata->y < this->child->height)
+            GUI_trigger(this->child, e, mdata);
+        else {
+            mdata->y -= this->child->height;
+            mdata->lasty -= this->child->height;
+            GUI_trigger(this->child->next, e, mdata);
+        }
+    } else {
+        if (mdata->x < this->child->width)
+            GUI_trigger(this->child, e, mdata);
+        else {
+            mdata->x -= this->child->width;
+            mdata->lastx -= this->child->width;
+            GUI_trigger(this->child->next, e, mdata);
+        }
+    }
+
+    free(mdata);
+}
+
+
+static void* mouse_moved(GUI* this, void* data) {
+    generic_mouse_event_forward(this, data, MOUSE_MOVED);
+}
+
+static void* mouse_clicked(GUI* this, void* data) {
+    generic_mouse_event_forward(this, data, CLICKED);
+}
+
+static void* mouse_released(GUI* this, void* data) {
+    generic_mouse_event_forward(this, data, RELEASED);
 }
 
 
@@ -116,6 +179,9 @@ GUI* GUI_split_layout(GUI* frame, SplitAxis axis, SplitSide fixed_side,
 
     // Add event listeners
     GUI_when(frame, RESIZED, resize_children);
+    GUI_when(frame, MOUSE_MOVED, mouse_moved);
+    GUI_when(frame, CLICKED, mouse_clicked);
+    GUI_when(frame, RELEASED, mouse_released);
 
     return frame;
 }

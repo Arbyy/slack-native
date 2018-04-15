@@ -64,17 +64,20 @@ static MouseData* generate_offset_mousedata(GUI* this, MouseData* original) {
 
 
 /*
- * Finds all elements that either the current or last mouse position are under,
- * and triggers the `MOUSE_MOVED` event on them, with the position of the
- * frame pointed to by *this subtracted from the mouse coordinates.
+ * Tracks down what child the mouse was or is over (if any), and if it was/is,
+ * forwards the mouse event to it.
  */
-static void* mouse_moved(GUI* this, void* data) {
+static void generic_mouse_event_forward(GUI* this, void* data, EventType e) {
     MouseData* mdata = generate_offset_mousedata(this, (MouseData*) data);
 
     if (mdata != NULL) {
         GUI* child = this->child;
         while (child != NULL) {
-            GUI_trigger_mouse_events(child, mdata);
+            if (e == MOUSE_MOVED)
+                GUI_trigger_mouse_events(child, mdata);
+            else if (mouse_event_is_inside(child, mdata)) {
+                GUI_trigger(child, e, mdata);
+            }
 
             child = child->next;
         }
@@ -83,40 +86,17 @@ static void* mouse_moved(GUI* this, void* data) {
     free(mdata);
 }
 
+
+static void* mouse_moved(GUI* this, void* data) {
+    generic_mouse_event_forward(this, data, MOUSE_MOVED);
+}
 
 static void* mouse_clicked(GUI* this, void* data) {
-    MouseData* mdata = generate_offset_mousedata(this, (MouseData*) data);
-
-    if (mdata != NULL) {
-        GUI* child = this->child;
-        while (child != NULL) {
-            if (mouse_event_is_inside(child, mdata)) {
-                GUI_trigger(child, CLICKED, mdata);
-            }
-
-            child = child->next;
-        }
-    }
-
-    free(mdata);
+    generic_mouse_event_forward(this, data, CLICKED);
 }
 
-
 static void* mouse_released(GUI* this, void* data) {
-    MouseData* mdata = generate_offset_mousedata(this, (MouseData*) data);
-
-    if (mdata != NULL) {
-        GUI* child = this->child;
-        while (child != NULL) {
-            if (mouse_event_is_inside(child, mdata)) {
-                GUI_trigger(child, RELEASED, mdata);
-            }
-
-            child = child->next;
-        }
-    }
-
-    free(mdata);
+    generic_mouse_event_forward(this, data, RELEASED);
 }
 
 

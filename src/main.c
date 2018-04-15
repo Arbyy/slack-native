@@ -69,7 +69,8 @@ int main(int argc, char* args[]) {
             GUI_label_set_default_font(default_font);
 
             GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
-                                          VERTICAL, LEFT, 220, PIXELS, false);
+                                          VERTICAL, LEFT, /*220, PIXELS, false);*/
+                                          33, PERCENT, false);
 
             GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
             sidebar->style = malloc(sizeof(GUIStyle));

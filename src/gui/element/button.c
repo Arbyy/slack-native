@@ -61,10 +61,6 @@ static void* clear_mousedown(GUI* this, void* data) {
     return NULL;
 }
 
-static void* mouse_moved(GUI* this, void* data) {
-    return NULL;
-}
-
 GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     GUI* this = GUI_alloc_generic(width, height);
     this->x = x;
@@ -89,7 +85,6 @@ GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     GUI_when(this, MOUSE_EXITED, clear_mouseover);
     GUI_when(this, CLICKED, set_mousedown);
     GUI_when(this, RELEASED, clear_mousedown);
-    GUI_when(this, MOUSE_MOVED, mouse_moved);
 
     // We haven't been rendered before
     this->dirty = true;
