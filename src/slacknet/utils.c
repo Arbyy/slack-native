@@ -93,6 +93,18 @@ slacknet_paramaterize_url(char* origurl,
     return retval;
 }
 
+CURLcode slacknet_send_get(char* url, SlacknetDataBuffer* data) {
+    CURL* curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "./cacert.pem");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, slacknet_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)data);
+    CURLcode result = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    return result;
+}
+
 CURLcode slacknet_send_post(char* url, char* params, SlacknetDataBuffer* data) {
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url);

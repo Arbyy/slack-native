@@ -40,6 +40,9 @@ typedef struct slacknet_url_parameter_t {
  * Generates a string from an array of SlacknetURLParameters. The string will be
  * formatted such as to typically suit the format expected by URL GET parameters
  * or POST parameters as per RFC-3986.
+ *
+ * NOTE: The resulting char* from this function is allocated on the heap, and
+ * must be freed.
  */ 
 char*
 slacknet_format_params_array(SlacknetURLParameter params[], size_t params_size);
@@ -53,6 +56,9 @@ slacknet_format_params_array(SlacknetURLParameter params[], size_t params_size);
  * and "value2" respectively.
  *
  * This function will return NULL if the params_size variable is an odd number.
+ *
+ * NOTE: The resulting SlacknetURLParameter* from this function is allocated on
+ * the heap, and must be freed (The strings within it are fine, however).
  */
 SlacknetURLParameter*
 slacknet_create_param_array(char** params, size_t params_size);
@@ -60,11 +66,29 @@ slacknet_create_param_array(char** params, size_t params_size);
 /*
  * A function that will add standard URL GET parameters to a base URL. It
  * accepts the original URL, as well as an array of SlacknetURLParameters.
+ *
+ * NOTE: The resulting char* from this function is allocated on the heap, and
+ * must be freed.
  */
 char*
 slacknet_paramaterize_url(char* origurl,
                           SlacknetURLParameter params[],
                           size_t params_size);
+
+/*
+ * A conveniance function that just sends a GET request to that URL. If you wish
+ * to use URL paramaters, slacknet_paramterize_url can create a URL with the get
+ * paramaters built in. The results of the POST request are put into the data
+ * argument.
+ *
+ * This function returns the CURLcode returned by curl_easy_perform for error
+ * detection.
+ *
+ * NOTE: This function expects that the file "cacert.pem" exists in the same
+ * directory as the executable. This is used to verify the SSL certificates
+ * presented by websites.
+ */ 
+CURLcode slacknet_send_get(char* url, SlacknetDataBuffer* data);
 
 /*
  * A conveniance function that just sends a POST request to the URL with
