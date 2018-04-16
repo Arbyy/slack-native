@@ -65,7 +65,7 @@ int main(int argc, char* args[]) {
             surface = SDL_GetWindowSurface(window);
 
             // GUI init
-            TTF_Font* default_font = TTF_OpenFont("NotoSans-Regular.ttf", 14);
+            TTF_Font* default_font = TTF_OpenFont("unifont-10.0.07.ttf", 16);
             GUI_label_set_default_font(default_font);
 
             GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
@@ -80,10 +80,10 @@ int main(int argc, char* args[]) {
             GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
             GUI_add_element(frame, content);
 
-            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, "test"));
+            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, ""));
             /* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); */
             /* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); */
-            /* GUI_add_element(frame, GUI_make_label(50, 350, 150, 24, "This is a test string.")); */
+            GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "このフォントの設定が気持ち悪いです。"));
             GUI_prepare(frame);
 
 
