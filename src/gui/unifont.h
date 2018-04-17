@@ -9,6 +9,11 @@
 #ifndef _UNIFONT_EMBEDDED_FONT_H
 #define _UNIFONT_EMBEDDED_FONT_H
 
+#include <stdint.h>
+
+// Length of the following char array (not counting the null terminator)
+uint64_t _UNIFONT_B64_STRLEN = 2819468;
+
 char _UNIFONT_B64_ENCODED[] =
 "/Td6WFoAAATm1rRGAgAhARwAAAAQz1jM5i7X7/5dAAAAUgokXym5VFU1VthhpfjEzxjp8iZE6GK/"
 "0AlKVLlqm72sptZEpucCx0Kt1V5n//bFUi0LLgls31Z4byRmb7/lgldhqlBERjftiNnilj7Cmhj8"
