@@ -77,4 +77,4 @@ xz --stdout -9 "${ttf}" | base64 | tee unifont | sed 's/.*/"&"/' >> "${output}"
 rm unifont
 
 # Finish the job...
-echo ";" >> "${output}"
+echo -e ";\n\n#endif" >> "${output}"

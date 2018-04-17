@@ -25,6 +25,9 @@ Super simple main file just to test all of the dependencies.
 #include "gui/style.h"
 #include "gui/gui.h"
 
+// RIP
+#include "gui/unifont.h"
+
 int SCREEN_WIDTH = 640;
 int SCREEN_HEIGHT = 480;
 
