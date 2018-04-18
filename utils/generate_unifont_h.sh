@@ -46,10 +46,10 @@ cat > "${output}" <<EOF
 
 #include <stdint.h>
 
-// Length of the following char array (not counting the null terminator)
+// Length of the following array
 uint64_t _UNIFONT_XZ_LEN = !REPLACE!;
 
-unsigned char _UNIFONT_XZ_ENCODED[] =
+unsigned char _UNIFONT_XZ_ENCODED[] = {
 EOF
 
 # Create named pipe
@@ -78,4 +78,4 @@ xz --stdout -9 "${ttf}" | xxd -i | tee unifont | sed 's/.*/  &/' >> "${output}"
 rm unifont
 
 # Finish the job...
-echo -e ";\n\n#endif" >> "${output}"
+echo -e "};\n\n#endif" >> "${output}"
