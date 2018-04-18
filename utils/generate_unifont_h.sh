@@ -37,9 +37,9 @@ cat > "${output}" <<EOF
  * If you've found this file whilst browsing the source code, look away. This
  * is one nasty file, and it would be better if nobody knew that this existed.
  *
- * It's a base64 encoded .ttf.xz file containing the Unifont Plane 0 font. This
- * serves as a font fallback for if nothing else is usable, as this font
- * supports _every_ Unicode character that this program is likely to ever see.
+ * This is a .ttf.xz file containing the Unifont Plane 0 font. This serves as a
+ * font fallback for if nothing else is usable, as this font supports _every_
+ * Unicode character that this program is likely to ever see.
  */
 #ifndef _UNIFONT_EMBEDDED_FONT_H
 #define _UNIFONT_EMBEDDED_FONT_H
@@ -47,21 +47,21 @@ cat > "${output}" <<EOF
 #include <stdint.h>
 
 // Length of the following char array (not counting the null terminator)
-uint64_t _UNIFONT_B64_STRLEN = !REPLACE!;
+uint64_t _UNIFONT_XZ_LEN = !REPLACE!;
 
-char _UNIFONT_B64_ENCODED[] =
+unsigned char _UNIFONT_XZ_ENCODED[] =
 EOF
 
 # Create named pipe
 mkfifo unifont
 
-# Script that counts the length of the output from the base64 conversion
+# Script that counts the number of bytes output by `xxd -i`
 read -d '' lenscript <<EOF
 import sys
 length = 0
 while True:
     try:
-        length += len(input())
+        length += len( list( filter(None, input().split(" "))))
     except EOFError:
         break
 sys.stdout.write(str(length))
@@ -71,9 +71,10 @@ EOF
 python3 -c "$lenscript" < unifont |
     xargs -I {} sh -c "sed -i 's/\!REPLACE\!/"{}"/' ${output}" &
 
-# Create the b64 encoded .tar.xz file, and encase each line with quotes
-xz --stdout -9 "${ttf}" | base64 | tee unifont | sed 's/.*/"&"/' >> "${output}"
+# Create the b64 encoded .tar.xz file, and indent each line by 4 spaces
+xz --stdout -9 "${ttf}" | xxd -i | tee unifont | sed 's/.*/  &/' >> "${output}"
 
+# Remove the FIFO named pipe
 rm unifont
 
 # Finish the job...
