@@ -46,10 +46,13 @@ cat > "${output}" <<EOF
 
 #include <stdint.h>
 
-// Length of the following array
-uint64_t _UNIFONT_XZ_LEN = !REPLACE!;
+// Size of the following array
+uint64_t _UNIFONT_XZ_SIZE = !XZ_SIZE!;
 
-unsigned char _UNIFONT_XZ_ENCODED[] = {
+// Size of the decompressed content
+uint64_t _UNIFONT_RAW_SIZE = !RAW_SIZE!;
+
+const uint8_t _UNIFONT_XZ_ENCODED[] = {
 EOF
 
 # Create named pipe
@@ -67,12 +70,16 @@ while True:
 sys.stdout.write(str(length))
 EOF
 
+# Insert the size of the decompressed font
+wc -c < "${ttf}" | xargs -I {} sh -c "sed -i 's/\!RAW_SIZE\!/"{}"/' ${output}"
+
 # Run the script and listen to output from the FIFO, then replace the length var
 python3 -c "$lenscript" < unifont |
-    xargs -I {} sh -c "sed -i 's/\!REPLACE\!/"{}"/' ${output}" &
+    xargs -I {} sh -c "sed -i 's/\!XZ_SIZE\!/"{}"/' ${output}" &
 
 # Create the b64 encoded .tar.xz file, and indent each line by 4 spaces
-xz --stdout -9 "${ttf}" | xxd -i | tee unifont | sed 's/.*/  &/' >> "${output}"
+xz --stdout -4e "${ttf}" |
+    xxd -i | tee unifont | sed 's/.*/  &/' >> "${output}"
 
 # Remove the FIFO named pipe
 rm unifont

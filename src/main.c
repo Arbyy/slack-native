@@ -5,6 +5,7 @@ Super simple main file just to test all of the dependencies.
 */
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,6 +27,8 @@ Super simple main file just to test all of the dependencies.
 #include "gui/gui.h"
 
 // RIP
+#include "xz/xz_config.h"
+#include "xz/xz.h"
 #include "gui/unifont.h"
 
 int SCREEN_WIDTH = 640;
@@ -68,10 +71,39 @@ int main(int argc, char* args[]) {
             surface = SDL_GetWindowSurface(window);
 
             // XXX test embedded font extraction
+            xz_crc32_init();
+            xz_crc64_init();
+            struct xz_dec* unifont_dec = xz_dec_init(XZ_SINGLE, 0);
 
+            struct xz_buf unifont_buf;
+            unifont_buf.in = _UNIFONT_XZ_ENCODED;
+            unifont_buf.in_pos = 0;
+            unifont_buf.in_size = _UNIFONT_XZ_SIZE;
+            unifont_buf.out = malloc(_UNIFONT_RAW_SIZE);
+            unifont_buf.out_pos = 0;
+            unifont_buf.out_size = _UNIFONT_RAW_SIZE;
+
+            printf("If the next line is not XZ_STREAM_END, something bad happened.\n");
+            switch (xz_dec_run(unifont_dec, &unifont_buf)) {
+            case XZ_OK: fprintf(stderr, "XZ_OK\n"); break;
+            case XZ_STREAM_END: fprintf(stderr, "XZ_STREAM_END\n"); break;
+            case XZ_UNSUPPORTED_CHECK: fprintf(stderr, "XZ_UNSUPPORTED_CHECK\n"); break;
+            case XZ_MEM_ERROR: fprintf(stderr, "XZ_MEM_ERROR\n"); break;
+            case XZ_MEMLIMIT_ERROR: fprintf(stderr, "XZ_MEMLIMIT_ERROR\n"); break;
+            case XZ_FORMAT_ERROR: fprintf(stderr, "XZ_FORMAT_ERROR\n"); break;
+            case XZ_OPTIONS_ERROR: fprintf(stderr, "XZ_FORMAT_ERROR\n"); break;
+            case XZ_DATA_ERROR: fprintf(stderr, "XZ_DATA_ERROR\n"); break;
+            case XZ_BUF_ERROR: fprintf(stderr, "XZ_BUF_ERROR\n"); break;
+                //fprintf(stderr, "Error decompressing embedded font\n");
+                //exit(EXIT_FAILURE);
+            }
+
+            xz_dec_end(unifont_dec);
+
+            SDL_RWops* unifont = SDL_RWFromMem(unifont_buf.out, _UNIFONT_RAW_SIZE);
 
             // GUI init
-            TTF_Font* default_font = TTF_OpenFont("unifont-10.0.07.ttf", 16);
+            TTF_Font* default_font = TTF_OpenFontRW(unifont, true, 16);
             GUI_label_set_default_font(default_font);
 
             GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
