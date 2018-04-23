@@ -19,9 +19,14 @@ typedef enum events_t {
     /* Keyboard */
     KEY_PRESSED,
     KEY_RELEASED,
+    /* Text entry */
+    TEXT_ENTERED,
+    TEXT_EDITED,  // Used by IMEs
 
     /* Internal use */
-    RESIZED
+    RESIZED,
+    FOCUSSED,
+    UNFOCUSSED
 } EventType;
 
 /*

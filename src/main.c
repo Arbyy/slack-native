@@ -107,8 +107,7 @@ int main(int argc, char* args[]) {
             GUI_label_set_default_font(default_font);
 
             GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
-                                          VERTICAL, LEFT, /*220, PIXELS, false);*/
-                                          33, PERCENT, false);
+                                          VERTICAL, LEFT, 220, PIXELS, false);
 
             GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
             sidebar->style = malloc(sizeof(GUIStyle));
@@ -126,18 +125,32 @@ int main(int argc, char* args[]) {
             GUI_add_element(content, GUI_make_label(50, 382, 300, 24, "ｖａｐｏｒｗａｖｅ　ａｅｓｔｈｅｔｉｃ"));
             GUI_prepare(frame);
 
-
+            SDL_Rect inRect = {300, 300, 200, 100};
+            SDL_SetTextInputRect(&inRect);
+            SDL_StartTextInput();
             SDL_Event event;
             while (1) {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT)
                         goto quit;
 
-                    if (event.type == SDL_WINDOWEVENT &&
+                    else if (event.type == SDL_WINDOWEVENT &&
                         (event.window.event == SDL_WINDOWEVENT_RESIZED ||
                          event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED))
                         // Obtain a new window surface whenever the window is resized
                         surface = SDL_GetWindowSurface(window);
+
+                    else if (event.type == SDL_TEXTINPUT) {
+                        printf("Text input: '%s'\n\n", event.text.text);
+                    }
+
+                    else if (event.type == SDL_TEXTEDITING) {
+                        printf("Text edited:\n"
+                               "    Composition: '%s'\n"
+                               "    Cursor: %i\n"
+                               "    Selection length: %i\n\n",
+                               event.edit.text, event.edit.start, event.edit.length);
+                    }
 
                     GUI_SDL_event_handler(frame, &event);
                 }
