@@ -3,11 +3,13 @@
 
 #include <SDL2/SDL_ttf.h>
 
+#include "../text.h"
 #include "../gui.h"
 
 typedef struct label_data_t {
     char* label;
-    TTF_Font* font;
+    FontFamily* family;
+    TextCollection* coll;
 } LabelData;
 
 /*
@@ -20,16 +22,16 @@ typedef struct label_data_t {
 GUI* GUI_make_label(int x, int y, int width, int height, char* label);
 
 /*
- * Sets the font instance that all labels will use by default unless they have
- * had their font set to something else.
+ * Sets the font family that all labels will use by default unless they have had
+ * their font family set to something else.
  */
-void GUI_label_set_default_font(TTF_Font* font);
+void GUI_label_set_default_font_family(FontFamily* family);
 
 /*
- * Sets a custom font for a single label, separate from the default font. The
- * font is not freed when any label using it is destroyed, so it must be freed
- * manually.
+ * Sets a custom font family for a single label, separate from the default font
+ * family. The family is not freed when any label using it is destroyed, so it
+ * must be freed manually after all labels that use it have been destroyed.
  */
-void GUI_label_set_font(GUI* label, TTF_Font* font);
+void GUI_label_set_font_family(GUI* label, FontFamily* family);
 
 #endif

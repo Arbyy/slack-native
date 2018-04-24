@@ -86,6 +86,9 @@ void GUI_free_font_family(FontFamily* family);
  * font. Characters will always prefer to be drawn by the font in the family
  * closest to the top of the font stack.
  *
+ * If @family is NULL, the text will be collected into a single collection which
+ * uses the embedded font (GNU Unifont).
+ *
  * By grouping text together this way, it reduces font draw operations
  * (especially when there is only one font needed for the entire text), and it
  * allows similar characters to have correct font kerning applied, by drawing

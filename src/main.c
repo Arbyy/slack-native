@@ -87,46 +87,30 @@ int main(int argc, char* args[]) {
             // XXX test embedded font extraction
             xz_crc32_init();
             xz_crc64_init();
-            GUI_font_init();
 
+            GUI_font_init();
             TTF_Font* notosans = TTF_OpenFont("NotoSans-Regular.ttf", 16);
             FontFamily* ff = GUI_create_font_family(1, (TTF_Font*[]){notosans});
 
-            TextCollection* coll = GUI_collect_text(ff, "Test です");
+            //GUI_label_set_default_font_family(ff);
 
-            unsigned int i = 1;
-            TextCollection* c = coll;
-            while (c != NULL) {
-                printf("%i (%p): \"%s\"\n", i, c->font, c->text);
-                i++;
-                c = c->next;
-            }
+            GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
+                                          VERTICAL, LEFT, 220, PIXELS, false);
 
-            unsigned int tw, th;
-            GUI_size_text_collection(coll, &tw, &th);
-            printf("String dimensions: %i, %i\n", tw, th);
+            GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
+            sidebar->style = malloc(sizeof(GUIStyle));
+            sidebar->style->bg = 0xFF333333;
+            GUI_add_element(frame, sidebar);
 
-            SDL_Surface* text_surf = GUI_draw_text_collection(coll, (SDL_Color){0, 0, 0, 255});
-            printf("Text surface dimensions: %i, %i\n", text_surf->w, text_surf->h);
+            GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
+            GUI_add_element(frame, content);
 
-            //GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
-            //                              VERTICAL, LEFT, 220, PIXELS, false);
-            GUI* frame = GUI_make_frame(0, 0, 640, 480);
-
-            /* GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0)); */
-            /* sidebar->style = malloc(sizeof(GUIStyle)); */
-            /* sidebar->style->bg = 0xFF333333; */
-            /* GUI_add_element(frame, sidebar); */
-
-            /* GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0)); */
-            /* GUI_add_element(frame, content); */
-
-            /* GUI_add_element(content, GUI_make_button(20, 20, 100, 30, "")); */
-            /* /\* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); *\/ */
-            /* /\* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); *\/ */
-            /* GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "これは日本語のテストストリング。")); */
-            /* GUI_add_element(content, GUI_make_label(50, 366, 300, 24, "This is a test string in English.")); */
-            /* GUI_add_element(content, GUI_make_label(50, 382, 300, 24, "ｖａｐｏｒｗａｖｅ　ａｅｓｔｈｅｔｉｃ")); */
+            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, ""));
+            /* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); */
+            /* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); */
+            GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "これは日本語のテストストリング。"));
+            GUI_add_element(content, GUI_make_label(50, 366, 300, 24, "This is a test string in English."));
+            GUI_add_element(content, GUI_make_label(50, 382, 300, 24, "This is a テスト ｍｉｘｅｄ string."));
             GUI_prepare(frame);
 
             SDL_Rect inRect = {300, 300, 200, 100};
@@ -162,20 +146,16 @@ int main(int argc, char* args[]) {
                 // GUI test stuff
                 bool updated = GUI_update(frame);
                 if (updated) {
-                    // Draw test text on top of everything else in the surface
-                    SDL_BlitSurface(text_surf, NULL, frame->surface, NULL);
-
                     SDL_FillRect(surface, NULL, 0);
 
                     SDL_BlitSurface(frame->surface, NULL, surface, NULL);
                     SDL_UpdateWindowSurface(window);
                 }
 
-                SDL_Delay(16);
+                SDL_Delay(15);
             }
 
         quit:
-            GUI_free_text_collection(coll);
             GUI_free(frame);
             TTF_CloseFont(notosans);
             GUI_free_font_family(ff);

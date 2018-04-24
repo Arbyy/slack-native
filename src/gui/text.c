@@ -84,8 +84,13 @@ void GUI_free_font_family(FontFamily* family) {
 /*
  * Takes a utf-16 character, and returns a pointer to the first font encountered
  * in the supplied font family (or the backup font) that contains the character.
+ *
+ * Returns the embedded font if the font family is NULL.
  */
 static TTF_Font* get_suitable_font_from_family(FontFamily* family, uint16_t c) {
+    if (family == NULL)
+        return unifont;
+
     for (size_t i = 0; i < family->num; i++)
         if (TTF_GlyphIsProvided(family->fonts[i], c))
             return family->fonts[i];
