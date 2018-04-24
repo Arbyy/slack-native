@@ -24,17 +24,31 @@ Super simple main file just to test all of the dependencies.
 #include "gui/layout/split.h"
 #include "gui/eventhandler.h"
 #include "gui/style.h"
+#include "gui/text.h"
 #include "gui/gui.h"
 
-// RIP
 #include "xz/xz_config.h"
 #include "xz/xz.h"
-#include "gui/unifont.h"
 
 int SCREEN_WIDTH = 640;
 int SCREEN_HEIGHT = 480;
 
 int main(int argc, char* args[]) {
+    /* const char teststr[] = "This is 本当にテストです。 ｗｉｄｅ normal."; */
+    /* printf("Testing splitting the string \"%s\" into individual chars\n", teststr); */
+
+    /* char buf[5]; */
+    /* const char* saveptr; */
+    /* utf8_next_char(teststr, buf, &saveptr); */
+
+    /* while (buf[0] != '\0') { */
+    /*     printf("%s\n", buf); */
+
+    /*     utf8_next_char(NULL, buf, &saveptr); */
+    /* } */
+
+    /* printf("Finished splitting the string\n"); */
+
     lws_set_log_level(LLL_USER | LLL_ERR | LLL_WARN | LLL_NOTICE, NULL);
 
     unsigned testavcodec = avcodec_version();
@@ -73,56 +87,46 @@ int main(int argc, char* args[]) {
             // XXX test embedded font extraction
             xz_crc32_init();
             xz_crc64_init();
-            struct xz_dec* unifont_dec = xz_dec_init(XZ_SINGLE, 0);
+            GUI_font_init();
 
-            struct xz_buf unifont_buf;
-            unifont_buf.in = _UNIFONT_XZ_ENCODED;
-            unifont_buf.in_pos = 0;
-            unifont_buf.in_size = _UNIFONT_XZ_SIZE;
-            unifont_buf.out = malloc(_UNIFONT_RAW_SIZE);
-            unifont_buf.out_pos = 0;
-            unifont_buf.out_size = _UNIFONT_RAW_SIZE;
+            TTF_Font* notosans = TTF_OpenFont("NotoSans-Regular.ttf", 16);
+            FontFamily* ff = GUI_create_font_family(1, (TTF_Font*[]){notosans});
 
-            printf("If the next line is not XZ_STREAM_END, something bad happened.\n");
-            switch (xz_dec_run(unifont_dec, &unifont_buf)) {
-            case XZ_OK: fprintf(stderr, "XZ_OK\n"); break;
-            case XZ_STREAM_END: fprintf(stderr, "XZ_STREAM_END\n"); break;
-            case XZ_UNSUPPORTED_CHECK: fprintf(stderr, "XZ_UNSUPPORTED_CHECK\n"); break;
-            case XZ_MEM_ERROR: fprintf(stderr, "XZ_MEM_ERROR\n"); break;
-            case XZ_MEMLIMIT_ERROR: fprintf(stderr, "XZ_MEMLIMIT_ERROR\n"); break;
-            case XZ_FORMAT_ERROR: fprintf(stderr, "XZ_FORMAT_ERROR\n"); break;
-            case XZ_OPTIONS_ERROR: fprintf(stderr, "XZ_FORMAT_ERROR\n"); break;
-            case XZ_DATA_ERROR: fprintf(stderr, "XZ_DATA_ERROR\n"); break;
-            case XZ_BUF_ERROR: fprintf(stderr, "XZ_BUF_ERROR\n"); break;
-                //fprintf(stderr, "Error decompressing embedded font\n");
-                //exit(EXIT_FAILURE);
+            TextCollection* coll = GUI_collect_text(ff, "Test です");
+
+            unsigned int i = 1;
+            TextCollection* c = coll;
+            while (c != NULL) {
+                printf("%i (%p): \"%s\"\n", i, c->font, c->text);
+                i++;
+                c = c->next;
             }
 
-            xz_dec_end(unifont_dec);
+            unsigned int tw, th;
+            GUI_size_text_collection(coll, &tw, &th);
+            printf("String dimensions: %i, %i\n", tw, th);
 
-            SDL_RWops* unifont = SDL_RWFromMem(unifont_buf.out, _UNIFONT_RAW_SIZE);
+            SDL_Surface* text_surf = GUI_draw_text_collection(coll, (SDL_Color){0, 0, 0, 255});
+            printf("Text surface dimensions: %i, %i\n", text_surf->w, text_surf->h);
 
-            // GUI init
-            TTF_Font* default_font = TTF_OpenFontRW(unifont, true, 16);
-            GUI_label_set_default_font(default_font);
+            //GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
+            //                              VERTICAL, LEFT, 220, PIXELS, false);
+            GUI* frame = GUI_make_frame(0, 0, 640, 480);
 
-            GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
-                                          VERTICAL, LEFT, 220, PIXELS, false);
+            /* GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0)); */
+            /* sidebar->style = malloc(sizeof(GUIStyle)); */
+            /* sidebar->style->bg = 0xFF333333; */
+            /* GUI_add_element(frame, sidebar); */
 
-            GUI* sidebar = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
-            sidebar->style = malloc(sizeof(GUIStyle));
-            sidebar->style->bg = 0xFF333333;
-            GUI_add_element(frame, sidebar);
+            /* GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0)); */
+            /* GUI_add_element(frame, content); */
 
-            GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
-            GUI_add_element(frame, content);
-
-            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, ""));
-            /* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); */
-            /* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); */
-            GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "これは日本語のテストストリング。"));
-            GUI_add_element(content, GUI_make_label(50, 366, 300, 24, "This is a test string in English."));
-            GUI_add_element(content, GUI_make_label(50, 382, 300, 24, "ｖａｐｏｒｗａｖｅ　ａｅｓｔｈｅｔｉｃ"));
+            /* GUI_add_element(content, GUI_make_button(20, 20, 100, 30, "")); */
+            /* /\* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); *\/ */
+            /* /\* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); *\/ */
+            /* GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "これは日本語のテストストリング。")); */
+            /* GUI_add_element(content, GUI_make_label(50, 366, 300, 24, "This is a test string in English.")); */
+            /* GUI_add_element(content, GUI_make_label(50, 382, 300, 24, "ｖａｐｏｒｗａｖｅ　ａｅｓｔｈｅｔｉｃ")); */
             GUI_prepare(frame);
 
             SDL_Rect inRect = {300, 300, 200, 100};
@@ -158,6 +162,9 @@ int main(int argc, char* args[]) {
                 // GUI test stuff
                 bool updated = GUI_update(frame);
                 if (updated) {
+                    // Draw test text on top of everything else in the surface
+                    SDL_BlitSurface(text_surf, NULL, frame->surface, NULL);
+
                     SDL_FillRect(surface, NULL, 0);
 
                     SDL_BlitSurface(frame->surface, NULL, surface, NULL);
@@ -168,9 +175,11 @@ int main(int argc, char* args[]) {
             }
 
         quit:
+            GUI_free_text_collection(coll);
             GUI_free(frame);
-            TTF_CloseFont(default_font);
-            default_font = NULL;
+            TTF_CloseFont(notosans);
+            GUI_free_font_family(ff);
+            GUI_font_destroy();
         }
     }
 
