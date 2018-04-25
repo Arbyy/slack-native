@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -192,7 +193,9 @@ void GUI_free_text_collection(TextCollection* coll) {
 
 void GUI_size_text_collection(TextCollection* coll,
                               unsigned int* width, unsigned int* height) {
-    int twidth, theight;
+    int twidth = 0, theight = 0;
+    *width = 0;
+    *height = 0;
     TextCollection* current = coll;
     while (current != NULL) {
         TTF_SizeUTF8(current->font, current->text, &twidth, &theight);
@@ -219,6 +222,12 @@ SDL_Surface* GUI_draw_text_collection(TextCollection* coll, SDL_Color colour) {
     while (current != NULL) {
         SDL_Surface* text =
             TTF_RenderUTF8_Blended(current->font, current->text, colour);
+
+        if (!text) {
+            fprintf(stderr, "Error printing section \"%s\" in text collection:\n%s\n",
+                    current->text, TTF_GetError());
+            continue;
+        }
 
         // Center text vertically and place to the right of text rendered before
         SDL_Rect dest;

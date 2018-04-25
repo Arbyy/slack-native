@@ -90,9 +90,10 @@ int main(int argc, char* args[]) {
 
             GUI_font_init();
             TTF_Font* notosans = TTF_OpenFont("NotoSans-Regular.ttf", 16);
-            FontFamily* ff = GUI_create_font_family(1, (TTF_Font*[]){notosans});
+            TTF_Font* notojp = TTF_OpenFont("NotoSansCJKjp-Regular.otf", 16);
+            FontFamily* ff = GUI_create_font_family(2, (TTF_Font*[]){notosans, notojp});
 
-            //GUI_label_set_default_font_family(ff);
+            GUI_label_set_default_font_family(ff);
 
             GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
                                           VERTICAL, LEFT, 220, PIXELS, false);
@@ -157,8 +158,9 @@ int main(int argc, char* args[]) {
 
         quit:
             GUI_free(frame);
-            TTF_CloseFont(notosans);
             GUI_free_font_family(ff);
+            TTF_CloseFont(notosans);
+            TTF_CloseFont(notojp);
             GUI_font_destroy();
         }
     }
