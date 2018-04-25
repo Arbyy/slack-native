@@ -5,8 +5,12 @@
 
 #include "../gui.h"
 
+/* Function pointer called when a button is clicked */
+typedef void (*ButtonAction)(GUI* this);
+
 typedef struct button_data_t {
     bool mouseover, mousedown; /* Controls rendering effects */
+    ButtonAction action;
 } ButtonData;
 
 /*
@@ -21,5 +25,11 @@ typedef struct button_data_t {
  * function.
  */
 GUI* GUI_make_button(int x, int y, int width, int height, char* label);
+
+/*
+ * Sets the function that will be called when the button is clicked. Pass NULL
+ * as the action to make the button do nothing when clicked.
+ */
+void GUI_set_button_action(GUI* button, ButtonAction action);
 
 #endif

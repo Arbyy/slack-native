@@ -9,12 +9,7 @@
 #include "gui.h"
 
 
-void GUI_free(GUI* elem) {
-    if (elem->child != NULL)
-        GUI_free(elem->child);
-    if (elem->next != NULL)
-        GUI_free(elem->next);
-
+static void GUI_free_single(GUI* elem) {
     GUI_free_listener_coll(elem->listeners);
     SDL_FreeSurface(elem->surface);
 
@@ -24,6 +19,15 @@ void GUI_free(GUI* elem) {
     free(elem->style);
     free(elem->aux);
     free(elem);
+}
+
+void GUI_free(GUI* elem) {
+    if (elem->child != NULL)
+        GUI_free(elem->child);
+    if (elem->next != NULL)
+        GUI_free(elem->next);
+
+    GUI_free_single(elem);
 }
 
 static void* resize_surface(GUI* this, void* data) {
@@ -75,8 +79,7 @@ GUI* GUI_alloc_generic(int width, int height) {
                                         0x000000FF);
 
     // If any allocations failed, clean up everything
-    if (gui->listeners == NULL ||
-        gui->surface == NULL) {
+    if (gui->listeners == NULL || gui->surface == NULL) {
         GUI_free(gui);
         return NULL;
     }
@@ -124,8 +127,8 @@ GUI* GUI_make_frame(int x, int y, int width, int height) {
 
 
 void GUI_add_element(GUI* parent, GUI* element) {
-    // There are no child elements yet
     if (parent->child == NULL) {
+        // There are no child elements yet
         parent->child = element;
         element->parent = parent;
         return;
@@ -140,6 +143,40 @@ void GUI_add_element(GUI* parent, GUI* element) {
     last_child->next = element;
     element->previous = last_child;
     element->parent = parent;
+}
+
+
+void GUI_remove_element(GUI* element) {
+    // Remove all children as well
+    GUI* child = element->child;
+    while (child != NULL) {
+        GUI_remove_element(child);
+        child = child->next;
+    }
+
+    if (element->previous != NULL) {
+        // Join previous and next children, if they exist
+        element->previous->next = element->next;
+
+        if (element->next != NULL) {
+            element->next->previous = element->previous;
+        }
+    } else if (element->parent != NULL) {
+        // Make the parent's second child the first child
+        element->parent->child = element->next;
+
+        if (element->next != NULL) {
+            // Make next element first element in the list
+            element->next->previous = NULL;
+        }
+    }
+
+    GUI_free_single(element);
+
+    // Make parent dirty, so it redraws without this element (also prevents a
+    // segfault, apparently)
+    if (element->parent != NULL)
+        element->parent->dirty = true;
 }
 
 

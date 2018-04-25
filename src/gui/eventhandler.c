@@ -21,8 +21,9 @@ void GUI_free_listener_coll(EventListenerCollection* coll) {
     if (coll != NULL) {
         EventListener* listener = coll->first;
         while (listener != NULL) {
+            EventListener* next = listener->next;
             free(listener);
-            listener = listener->next;
+            listener = next;
         }
 
         free(coll);

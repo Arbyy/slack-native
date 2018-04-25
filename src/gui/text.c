@@ -226,7 +226,7 @@ SDL_Surface* GUI_draw_text_collection(TextCollection* coll, SDL_Color colour) {
         if (!text) {
             fprintf(stderr, "Error printing section \"%s\" in text collection:\n%s\n",
                     current->text, TTF_GetError());
-            continue;
+            continue; // Let's be optimistic about rendering the remaining text
         }
 
         // Center text vertically and place to the right of text rendered before
@@ -237,6 +237,7 @@ SDL_Surface* GUI_draw_text_collection(TextCollection* coll, SDL_Color colour) {
         dest.h = text->h;
 
         SDL_BlitSurface(text, NULL, surf, &dest);
+        SDL_FreeSurface(text);
 
         twidth += text->w;
 

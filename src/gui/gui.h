@@ -48,7 +48,9 @@ struct gui_t {
  * *aux field of GUI elements as well.
  *
  * NOTE: If the *aux field contains any sub-structures that must be freed, this
- * function will not free them. They must be manually freed first.
+ * function will not free them. They must be manually freed first. This is
+ * _usually_ handled by the elements themselves by adding an auxfree function to
+ * the GUI struct.
  */
 void GUI_free(GUI* elem);
 
@@ -75,6 +77,15 @@ GUI* GUI_make_frame(int x, int y, int width, int height);
  * the end of the child chain is reached, upon which the new element is added.
  */
 void GUI_add_element(GUI* parent, GUI* element);
+
+/*
+ * Removes the element from its place amongst the children of its parent. Note
+ * that you don't need to specify the parent of the element to remove it. This
+ * function also frees the element being removed, along with its children, so
+ * be sure to save any information that these elements hold that you need before
+ * calling this function.
+ */
+void GUI_remove_element(GUI* element);
 
 /*
  * Calls the paint function pointer on the supplied element, as well as all

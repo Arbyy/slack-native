@@ -33,6 +33,11 @@ Super simple main file just to test all of the dependencies.
 int SCREEN_WIDTH = 640;
 int SCREEN_HEIGHT = 480;
 
+// Called when the "delet this" button is clicked
+static void delete_button(GUI* this) {
+    GUI_remove_element(this);
+}
+
 int main(int argc, char* args[]) {
     /* const char teststr[] = "This is 本当にテストです。 ｗｉｄｅ normal."; */
     /* printf("Testing splitting the string \"%s\" into individual chars\n", teststr); */
@@ -106,9 +111,11 @@ int main(int argc, char* args[]) {
             GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
             GUI_add_element(frame, content);
 
-            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, "はい"));
-            /* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); */
-            /* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); */
+            // Create a button that, when clicked, removes itself from the GUI
+            GUI* delet_btn = GUI_make_button(20, 20, 100, 30, "delete this");
+            GUI_set_button_action(delet_btn, delete_button);
+            GUI_add_element(content, delet_btn);
+
             GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "これは日本語のテストストリング。"));
             GUI_add_element(content, GUI_make_label(50, 366, 300, 24, "This is a test string in English."));
             GUI_add_element(content, GUI_make_label(50, 382, 300, 24, "This is a テスト ｍｉｘｅｄ string."));

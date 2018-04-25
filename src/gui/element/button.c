@@ -53,11 +53,17 @@ static void* set_mousedown(GUI* this, void* data) {
     return NULL;
 }
 
-static void* clear_mousedown(GUI* this, void* data) {
-    // TODO: add actions when the mouse is released
+static void* clear_mousedown_and_trigger_action(GUI* this, void* data) {
     ButtonData* bdata = this->aux;
+
+    bool was_down = bdata->mousedown;
     bdata->mousedown = false;
     this->dirty = true;
+
+    // Only call the action if the mouse wasn't dragged out and back in
+    if (was_down && bdata->action != NULL) 
+        bdata->action(this);
+
     return NULL;
 }
 
@@ -75,6 +81,7 @@ GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     // Clear aux fields
     data->mouseover = false;
     data->mousedown = false;
+    data->action = NULL;
 
     // Create label and add it to the button
     GUI* label_elem = GUI_make_label(x, y, width, height, label);
@@ -84,10 +91,14 @@ GUI* GUI_make_button(int x, int y, int width, int height, char* label) {
     GUI_when(this, MOUSE_ENTERED, set_mouseover);
     GUI_when(this, MOUSE_EXITED, clear_mouseover);
     GUI_when(this, CLICKED, set_mousedown);
-    GUI_when(this, RELEASED, clear_mousedown);
+    GUI_when(this, RELEASED, clear_mousedown_and_trigger_action);
 
     // We haven't been rendered before
     this->dirty = true;
 
     return this;
+}
+
+void GUI_set_button_action(GUI* button, ButtonAction action) {
+    ((ButtonData*) button->aux)->action = action;
 }
