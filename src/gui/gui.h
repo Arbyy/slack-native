@@ -35,7 +35,7 @@ struct gui_t {
     bool dirty;
     PaintFunc paint;
 
-    GUI *child, *next;
+    GUI *parent, *child, *previous, *next;
 
     /* Element type specific data */
     AuxFreeFunc auxfree;

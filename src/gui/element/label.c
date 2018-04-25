@@ -78,13 +78,13 @@ GUI* GUI_make_label(int x, int y, int width, int height, char* label) {
 }
 
 
-void GUI_label_set_default_font_family(FontFamily* family) {
+void GUI_set_label_default_font_family(FontFamily* family) {
     if (family != NULL)
         default_family = family;
 }
 
 
-void GUI_label_set_font_family(GUI* label, FontFamily* family) {
+void GUI_set_label_font_family(GUI* label, FontFamily* family) {
     LabelData* data = label->aux;
 
     if (family != NULL)

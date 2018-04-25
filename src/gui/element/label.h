@@ -25,13 +25,13 @@ GUI* GUI_make_label(int x, int y, int width, int height, char* label);
  * Sets the font family that all labels will use by default unless they have had
  * their font family set to something else.
  */
-void GUI_label_set_default_font_family(FontFamily* family);
+void GUI_set_label_default_font_family(FontFamily* family);
 
 /*
  * Sets a custom font family for a single label, separate from the default font
  * family. The family is not freed when any label using it is destroyed, so it
  * must be freed manually after all labels that use it have been destroyed.
  */
-void GUI_label_set_font_family(GUI* label, FontFamily* family);
+void GUI_set_label_font_family(GUI* label, FontFamily* family);
 
 #endif

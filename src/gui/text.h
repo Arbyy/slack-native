@@ -19,7 +19,7 @@ struct text_collection_t {
 };
 
 /**
- * GUI_font_init() - Initialises the font system (decompresses embedded font).
+ * GUI_init_font() - Initialises the font system (decompresses embedded font).
  *
  * This must be called before any other text related functions are called, but
  * xz_crc32_init() and xz_crc64_init() must be called before this is called. If
@@ -32,16 +32,16 @@ struct text_collection_t {
  *
  * Returns false if the embedded GNU Unifont could not be loaded for any reason.
  */
-bool GUI_font_init(void);
+bool GUI_init_font(void);
 
 /**
- * GUI_font_destroy() - Destroys all font state and buffers.
+ * GUI_destroy_font() - Destroys all font state and buffers.
  *
  * This cleans up everything to do with the font system, and should only really
  * be called when the program is being closed. No other font functions besides
  * GUI_font_init() should be called after this has been called.
  */
-void GUI_font_destroy(void);
+void GUI_destroy_font(void);
 
 /**
  * GUI_create_font_family() - Create a new collection of fonts.

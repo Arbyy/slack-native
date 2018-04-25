@@ -15,7 +15,7 @@
 static uint8_t* unifont_raw;
 static TTF_Font* unifont;
 
-bool GUI_font_init(void) {
+bool GUI_init_font(void) {
     // Decompress everything in a single run
     struct xz_dec* unifont_dec = xz_dec_init(XZ_SINGLE, 0);
 
@@ -52,7 +52,7 @@ bool GUI_font_init(void) {
     return unifont != NULL;
 }
 
-void GUI_font_destroy(void) {
+void GUI_destroy_font(void) {
     TTF_CloseFont(unifont);
     unifont = NULL;
 

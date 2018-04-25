@@ -88,12 +88,12 @@ int main(int argc, char* args[]) {
             xz_crc32_init();
             xz_crc64_init();
 
-            GUI_font_init();
+            GUI_init_font();
             TTF_Font* notosans = TTF_OpenFont("NotoSans-Regular.ttf", 16);
             TTF_Font* notojp = TTF_OpenFont("NotoSansCJKjp-Regular.otf", 16);
             FontFamily* ff = GUI_create_font_family(2, (TTF_Font*[]){notosans, notojp});
 
-            GUI_label_set_default_font_family(ff);
+            GUI_set_label_default_font_family(ff);
 
             GUI* frame = GUI_split_layout(GUI_make_frame(0, 0, 640, 480),
                                           VERTICAL, LEFT, 220, PIXELS, false);
@@ -106,7 +106,7 @@ int main(int argc, char* args[]) {
             GUI* content = GUI_simple_layout(GUI_make_frame(0, 0, 0, 0));
             GUI_add_element(frame, content);
 
-            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, ""));
+            GUI_add_element(content, GUI_make_button(20, 20, 100, 30, "はい"));
             /* GUI_add_element(frame, GUI_make_button(200, 54, 180, 238, "test2")); */
             /* GUI_add_element(frame, GUI_make_button(38, 209, 60, 24, "test3")); */
             GUI_add_element(content, GUI_make_label(50, 350, 300, 24, "これは日本語のテストストリング。"));
@@ -153,6 +153,8 @@ int main(int argc, char* args[]) {
                     SDL_UpdateWindowSurface(window);
                 }
 
+                // This needs to be changed to something that actually loops at
+                // a constant 60 (or whatever) times a second.
                 SDL_Delay(15);
             }
 
@@ -161,7 +163,7 @@ int main(int argc, char* args[]) {
             GUI_free_font_family(ff);
             TTF_CloseFont(notosans);
             TTF_CloseFont(notojp);
-            GUI_font_destroy();
+            GUI_destroy_font();
         }
     }
 

@@ -55,8 +55,10 @@ GUI* GUI_alloc_generic(int width, int height) {
 
     // Clear all pointer fields
     gui->listeners = NULL;
+    gui->previous = NULL;
     gui->surface = NULL;
     gui->auxfree = NULL;
+    gui->parent = NULL;
     gui->style = NULL;
     gui->paint = NULL;
     gui->child = NULL;
@@ -125,6 +127,7 @@ void GUI_add_element(GUI* parent, GUI* element) {
     // There are no child elements yet
     if (parent->child == NULL) {
         parent->child = element;
+        element->parent = parent;
         return;
     }
 
@@ -135,6 +138,8 @@ void GUI_add_element(GUI* parent, GUI* element) {
 
     // Add the element to the end child
     last_child->next = element;
+    element->previous = last_child;
+    element->parent = parent;
 }
 
 
